@@ -3,8 +3,8 @@ Sensor2Cloud official repository.
 Folders:
 
 * Docs: documentation and description
-* StartProjects: code to start the lab
-* EndProjects: final projects
+* InitialProjects: code to start the lab
+* FinalProjects: final projects
 * Utilities: script and other
 
 
@@ -17,6 +17,6 @@ In order to test:
 Use the following commad to avoid committing config files
 
 ```
-git update-index --assume-unchanged StartProjects/*/*.config
-git update-index --assume-unchanged EndProjects/*/*.config
+git update-index --assume-unchanged InitialProjects/*/*.config
+git update-index --assume-unchanged FinalProjects/*/*.config
 ```
