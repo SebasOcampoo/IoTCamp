@@ -1,0 +1,1 @@
+Sensor2Cloud projects' folder.

@@ -1,0 +1,313 @@
+﻿/* Set padding to keep content from hitting the edges */
+* {
+    color: #002052;
+}
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+.big-block {
+    margin-left: 10px;
+    padding-bottom: 40px;
+}
+
+
+.body-charts {
+    min-height: 85vh;
+}
+
+
+.hexInput {
+    height: 100px;
+    width: 100px;
+    font-size: xx-large;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.bottonGo {
+    height: 100px;
+    text-align: center;
+    padding-top: 25px;
+}
+
+.bottonGo > img {
+    cursor: pointer;
+}
+
+.hexInputError {
+    border: 1px solid red;
+}
+
+.hexInputOk {
+    border: 1px groove green;
+}
+
+.truncate {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block; /* for links */
+    max-height: 100px;
+}
+
+.errormessage {
+    color: red;
+    font-weight: bolder;
+}
+
+#controllersContainer {
+    position: relative;
+    text-align: center;
+}
+
+.chartContainer {
+    width: 100%;
+    height: 380px;
+    display: none;
+}
+
+.tableContainer {
+    width: 100%;
+    display: none;
+}
+
+.noChartContainer {
+    width: 100%;
+    display: block;
+    color: red;
+    font-weight: bold;
+    font-size: small;
+    text-indent: 50px;
+}
+
+
+.alarmLine {
+    font-size: small;
+    text-align: left;
+    text-indent: 10px;
+}
+
+.bar-link {
+    padding-left: 20px;
+    border-right: 1px solid black;
+    padding-right: 5px;
+    text-align: center;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    color: red;
+}
+
+.header-logos {
+    height: 20px;
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.form-element-valid {
+    border-color: green;
+}
+
+.thresholdContainer {
+    display: none;
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+}
+
+#chartsPartial {
+    margin-top: 3vh;
+}
+
+#chartsPartial a[data-toggle=tab] {
+    display: none;
+}
+
+#containerName {
+    margin: 0;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+}
+
+
+
+#macHidden ul.device-status-bullets li{
+    display: flex;
+    margin-top: 5px;
+}
+
+.bullet {
+    background-color: green;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 0;
+}
+
+.bullet-text {
+    margin-left: 5px;
+}
+       
+.bullet.disconnected {
+    background-color: red;
+}
+
+.bullet.warning {
+    background-color: yellow;
+}
+
+.bullet.disabled {
+    background-color: red;
+}
+
+.bullet.unknown {
+    background-color: grey;
+}
+
+.navbar-brand {
+    padding: 7px 15px;    
+}
+
+.navbar .st-logo {
+    height: 36px;
+    padding: 0;
+}
+
+.navbar .blog-logo {
+    padding: 0;
+}
+
+.navbar .site-name {
+    display: block;
+    padding: 11px;
+    font-size: 20px;
+    font-weight: bold;
+
+    display: inline-block;
+    width: 100%;
+    position: absolute;
+    text-align: center;
+    left: 0;
+    z-index: -1;
+}
+
+.homepage-p {
+    font-size: large;
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+
+.homepage-img {
+    width: 100%;
+}
+
+.device-name {
+    text-align: center;
+}
+
+.device-name h4 {
+    display: inline-block;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.about-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.about-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    margin-top: 3em;
+    margin-bottom: 1em;
+}
+
+.about-row .about-img {
+    background-repeat: no-repeat;
+    background-position: center; 
+    height: 10em;
+    min-width: 10em;
+    background-size: contain;
+}
+
+.about-row .description {
+    font-size: medium;
+    text-align: left;
+    vertical-align: middle;
+    margin-left: 2em;
+    margin-right: 10em;
+}
+
+.register-message-container {
+    margin-top: 10px; 
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    align-items: baseline; 
+}
+
+.register-message-text-container {
+    width: 90%
+}
+
+#speech_api_output {
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    color: #555555;
+    vertical-align: middle;
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 0 4px;
+}
+
+.btn-circle {
+    padding: 0;
+    width: 70px;
+    height: 70px;
+    overflow: hidden;
+    border-radius: 35px;
+    text-indent: -300px;
+}
+
+.microphone {
+    background: #008272 url(../Images/mic.png) no-repeat center center;
+    background-size: 38%;
+    margin-right: -10px;
+    z-index: 100;
+}
+
+.microphone.listening {
+    background: #008272 url(../Images/listening.gif) no-repeat center center;
+    background-size: 100%;
+}
+
+#timer-show {
+    width: 100%;
+    height: 5px;
+    background-color: #008272;
+}
+

@@ -1,0 +1,200 @@
+﻿@model CTDWeb.Models.InsertModel
+@{
+    ViewBag.Title = "Home Page";
+}
+
+
+<div class="col-md-12" id="macIns">
+    <div class="col-md-12">
+        <p class="homepage-p">STM32ODE web dashboard based on Microsoft Azure IoT for evaluation of <a href="http://www.st.com/content/st_com/en/products/embedded-software/mcus-embedded-software/stm32-embedded-software/stm32-ode-function-pack-sw/fp-cld-azure1.html" target="_blank">FP-CLD-AZURE1</a>.</p>
+        <img class="homepage-img" src="~/Images/BN_STM32ODE-enables_WBG.PNG" />
+    </div>
+    <div class="col-md-12">
+        <p class="homepage-p">
+            Follow instructions from <a href="http://www.st.com/content/st_com/en/products/embedded-software/mcus-embedded-software/stm32-embedded-software/stm32-ode-function-pack-sw/fp-cld-azure1.html" target="_blank">FP-CLD-AZURE1</a> to learn how to build your STM32 Nucleo based IoT node. Type in the box below the MAC address of your device.
+        </p>
+    </div>
+
+    <div class="col-md-12">
+        <h3>Insert device identifier (MAC address)</h3>
+    </div>
+    <div class="col-md-11">
+        <div class="col-md-2 hexInputContainer">
+            <input type="text" name="mac1" id="mac1" maxlength="2" oninput="inputHex(this)" class="hexInput" value="@Model.MAC1" />
+        </div>
+        <div class="col-md-2 hexInputContainer">
+            <input type="text" name="mac2" id="mac2" maxlength="2" oninput="inputHex(this)" class="hexInput" value="@Model.MAC2" />
+        </div>
+        <div class="col-md-2 hexInputContainer">
+            <input type="text" name="mac3" id="mac3" maxlength="2" oninput="inputHex(this)" class="hexInput" value="@Model.MAC3" />
+        </div>
+        <div class="col-md-2 hexInputContainer">
+            <input type="text" name="mac4" id="mac4" maxlength="2" oninput="inputHex(this)" class="hexInput" value="@Model.MAC4" />
+        </div>
+        <div class="col-md-2 hexInputContainer">
+            <input type="text" name="mac5" id="mac5" maxlength="2" oninput="inputHex(this)" class="hexInput" value="@Model.MAC5" />
+        </div>
+        <div class="col-md-2 hexInputContainer">
+            <input type="text" name="mac6" id="mac6" maxlength="2" oninput="inputHex(this)" class="hexInput" value="@Model.MAC6" />
+        </div>
+    </div>
+    <div class="col-md-1 bottonGo" style="text-align:center;">
+        <img src="~/Images/Buttons/go.png" height="50" onclick="validateInputHexSubmit()" />
+    </div>
+</div>
+
+
+<script>
+    var macAddress = null;
+
+    $(document).ready(function () {
+        $('#macHidden').hide();
+        $("#chartsDiv").hide();
+
+        if (macAddress != null) {
+            $("#mac1").val(macAddress.substr(0, 2));
+            $("#mac2").val(macAddress.substr(2, 2));
+            $("#mac3").val(macAddress.substr(4, 2));
+            $("#mac4").val(macAddress.substr(6, 2));
+            $("#mac5").val(macAddress.substr(8, 2));
+            $("#mac6").val(macAddress.substr(10, 2));
+
+            // This is commented IN ORDER TO PREVEND DoS ATTACKS
+            //$("#macIns").slideUp(1000, showNewButton);
+
+        }
+    });
+
+
+    function isHex(value) {
+        if (isNaN(parseInt("0X" + value))) {
+            return false;
+        }
+        else {
+            return true;
+        }
+        return true;
+    }
+
+
+    function validateHexInput(input) {
+
+        if (input.value.length == 2) {
+            if (!isHex(input.value[0]) || !isHex(input.value[1])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    function validateInputHexSubmit() {
+        var result = true;
+        var options = {};
+
+        if (!inputHex(document.getElementById('mac1'))) {
+            result = false;
+
+            $("#mac1").addClass("hexInputError");
+            $("#mac1").removeClass("hexInputOk");
+        }
+
+        if (!inputHex(document.getElementById('mac2'))) {
+            result = false;
+
+            $("#mac2").addClass("hexInputError");
+            $("#mac2").removeClass("hexInputOk");
+        }
+
+        if (!inputHex(document.getElementById('mac3'))) {
+            result = false;
+
+            $("#mac3").addClass("hexInputError");
+            $("#mac3").removeClass("hexInputOk");
+        }
+
+        if (!inputHex(document.getElementById('mac4'))) {
+            result = false;
+
+            $("#mac4").addClass("hexInputError");
+            $("#mac4").removeClass("hexInputOk");
+        }
+
+        if (!inputHex(document.getElementById('mac5'))) {
+            result = false;
+
+            $("#mac5").addClass("hexInputError");
+            $("#mac5").removeClass("hexInputOk");
+        }
+
+        if (!inputHex(document.getElementById('mac6'))) {
+            result = false;
+
+            $("#mac6").addClass("hexInputError");
+            $("#mac6").removeClass("hexInputOk");
+        }
+
+
+        if (result) {
+            macAddress = $("#mac1").val() + $("#mac2").val() + $("#mac3").val() + $("#mac4").val() + $("#mac5").val() + $("#mac6").val();
+            macAddress = macAddress.toUpperCase();
+            window.location.href = "/Home/Index/" + macAddress;
+        }
+        else {
+            messageOutput("Id Error! The inserted identifier is not valid or is not complete", true, true);
+        }
+
+
+    }
+
+    function showMacInput() {
+        $("#macHidden").hide();
+        deregisterSignalRClient($("#chartsDiv"))
+        $("#macIns").slideDown(1000);
+        removeMACfromSessionStorage();
+
+        HideCharts();
+    }
+
+    function inputHex(input) {
+        if (input.value.length <= 1) {
+            $(input).removeClass("hexInputError");
+            $(input).removeClass("hexInputOk");
+            return false;
+        }
+        else {
+
+            if (validateHexInput(input)) {
+                $(input).removeClass("hexInputError");
+                $(input).addClass("hexInputOk");
+
+                if (input.name == 'mac1') {
+                    $("#mac2").focus();
+                }
+                if (input.name == 'mac2') {
+                    $("#mac3").focus();
+                }
+                if (input.name == 'mac3') {
+                    $("#mac4").focus();
+                }
+                if (input.name == 'mac4') {
+                    $("#mac5").focus();
+                }
+                if (input.name == 'mac5') {
+                    $("#mac6").focus();
+                }
+                if (input.name == 'mac6') {
+                }
+                return true;
+            }
+            else {
+                $(input).addClass("hexInputError");
+                $(input).removeClass("hexInputOk");
+                return false;
+            }
+
+        }
+
+    }
+
+</script>

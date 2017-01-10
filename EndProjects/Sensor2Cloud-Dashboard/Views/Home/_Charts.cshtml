@@ -1,0 +1,385 @@
+﻿@{
+    ViewBag.Title = "_Charts";
+}
+
+<!--<script type="text/javascript" src="~/Scripts/Socket/WebSocketSource.js"></script>-->
+<script type="text/javascript" src="~/Scripts/canvas/canvasjs.min.js"></script>
+<script type="text/javascript" src="~/Scripts/charts/charts.js"></script>
+
+<div class="row">
+    <div class="col-md-12" id="chartsPartial">
+
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#temperature" role="tab" data-toggle="tab">Temperature</a></li>
+            <li role="presentation"><a href="#humidity" role="tab" data-toggle="tab">Humidity</a></li>
+            <li role="presentation"><a href="#accelerometer" role="tab" data-toggle="tab">Accelerometer</a></li>
+            <li role="presentation"><a href="#gyroscope" role="tab" data-toggle="tab">Gyroscope</a></li>
+        </ul>
+
+
+        <!-- Tab panes -->
+        <div class="tab-content col-md-12">
+
+            <!-- Temperature -->
+            <div role="tabpanel" class="tab-pane active" id="temperature">
+                <div id="noChartTemperatureContainer" class="noChartContainer">No available data</div>
+                <br />
+                <div class="row">
+                    <div class="col-md-6">
+                        <form id="temperatureThresholdContainer" class="thresholdContainer">
+                            <div class="input-group col-md-9">
+                                <span class="input-group-addon" id="basic-addon1">Temp Threshold</span>
+                                <input type="text" class="form-control" name="tempThreshold" value="30" data-validation="number" data-validation-allowing="range[0.0;50.0],float" />
+                            </div>
+                            <div class="col-md-3">
+                                <input type="submit" class="btn btn-primary" value="Save" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div id="chartTemperatureContainer" class="chartContainer"></div>
+                </div>
+                <br />
+                <div class="row">
+                    <div id="tableAlarmsContainerTemperature" class="tableContainer">
+                        <div class="col-md-12 bold" style="font-size:large;">
+                            Real time alerts to device
+                        </div>
+                        <div class="table-editable">
+                            <table class="table" id="table_Alarm_temperature">
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Device</th>
+                                    <th>Alert</th>
+                                    <th>Message</th>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- Humidity -->
+            <div role="tabpanel" class="tab-pane" id="humidity">
+                <div id="noChartHumidityContainer" class="noChartContainer">No available data</div>
+                <br />
+                <div class="row">
+                    <div class="col-md-6">
+                        <form id="humidityThresholdContainer" class="thresholdContainer">
+                            <div class="input-group col-md-9">
+                                <span class="input-group-addon" id="basic-addon1">Humidity Threshold</span>
+                                <input type="text" class="form-control" name="humThreshold" value="50" data-validation="number" data-validation-allowing="range[0.0;100.0],float" />
+                            </div>
+                            <div class="col-md-3">
+                                <input type="submit" class="btn btn-primary" value="Save" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div id="chartHumidityContainer" class="chartContainer"></div>
+                </div>
+                <br />
+                <div class="row">
+                    <div id="tableAlarmsContainerHumidity" class="tableContainer">
+                        <div class="col-md-12 bold" style="font-size:large;">
+                            Real time alerts to device
+                        </div>
+                        <div class="table-editable">
+                            <table class="table" id="table_Alarm_humidity">
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Device</th>
+                                    <th>Alert</th>
+                                    <th>Message</th>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Accelerometer -->
+            <div role="tabpanel" class="tab-pane" id="accelerometer">
+                <div id="noChartAccelerometerContainer" class="noChartContainer"><p>No available data</p></div>
+                <br />
+                <div class="row">
+                    <div class="col-md-12">
+                        <form id="accelorometerThresholdContainer" class="thresholdContainer">
+                            <div class="input-group col-md-5 col-lg-5 pull-left">
+                                <span class="input-group-addon" id="basic-addon1">Acc X Upper Threshold</span>
+                                <input type="text" class="form-control" name="accXUpperThreshold" value="1100" data-validation="number" data-validation-allowing="range[-2000.0;2000.0],float,negative" />
+                            </div>
+                            <div class="input-group col-md-5 col-lg-5 pull-left">
+                                <span class="input-group-addon" id="basic-addon1">Acc X Lower Threshold</span>
+                                <input type="text" class="form-control" name="accXLowerThreshold" value="-1100" data-validation="number" data-validation-allowing="range[-2000.0;2000.0],float,negative" />
+                            </div>
+                            <br />
+                            <div class="input-group col-md-5 col-lg-5 pull-left">
+                                <span class="input-group-addon" id="basic-addon1">Acc Y Upper Threshold</span>
+                                <input type="text" class="form-control" name="accYUpperThreshold" value="1100" data-validation="number" data-validation-allowing="range[-2000.0;2000.0],float,negative" />
+                            </div>
+                            <div class="input-group col-md-5 col-lg-5 pull-left">
+                                <span class="input-group-addon" id="basic-addon1">Acc Y Lower Threshold</span>
+                                <input type="text" class="form-control" name="accYLowerThreshold" value="-1100" data-validation="number" data-validation-allowing="range[-2000.0;2000.0],float,negative" />
+
+                            </div>
+                            <br />
+                            <div class="input-group col-md-5 col-lg-5 pull-left">
+                                <span class="input-group-addon" id="basic-addon1">Acc Z Upper Threshold</span>
+                                <input type="text" class="form-control" name="accZUpperThreshold" value="1100" data-validation="number" data-validation-allowing="range[-2000.0;2000.0],float,negative" />
+                            </div>
+                            <div class="input-group col-md-5 col-lg-5 pull-left">
+                                <span class="input-group-addon" id="basic-addon1">Acc Z Lower Threshold</span>
+                                <input type="text" class="form-control" name="accZLowerThreshold" value="-1100" data-validation="number" data-validation-allowing="range[-2000.0;2000.0],float,negative" />
+                            </div>
+                            <div class="input-group col-md-1 col-lg-1 pull-left">
+                                <input type="submit" class="btn btn-primary" value="Save" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div id="chartAccelerometerContainer" class="chartContainer"></div>
+                </div>
+                <br />
+                <div class="row">
+                    <div id="tableAlarmsContainerAccelerometer" class="tableContainer">
+                        <div class="col-md-12 bold" style="font-size:large;">
+                            Real time alerts to device
+                        </div>
+                        <div class="table-editable">
+                            <table class="table" id="table_Alarm_Accelerometer">
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Device</th>
+                                    <th>Alert</th>
+                                    <th>Message</th>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Gyroscope -->
+            <div role="tabpanel" class="tab-pane" id="gyroscope">
+                <div id="noChartGyroscopeContainer" class="noChartContainer">No available data</div>
+                <br />
+                <div class="row">
+                    <div class="col-md-12">
+                        <form id="gyrThresholdContainer" class="thresholdContainer">
+                            <div class="input-group col-md-5 col-lg-5 pull-left">
+                                <span class="input-group-addon" id="basic-addon1">Gyr X Upper Threshold</span>
+                                <input type="text" class="form-control" name="gyrXUpperThreshold" value="20000" data-validation="number" data-validation-allowing="range[-30000.0;30000.0],float,negative" />
+                            </div>
+                            <div class="input-group col-md-5 col-lg-5 pull-left">
+                                <span class="input-group-addon" id="basic-addon1">Gyr X Lower Threshold</span>
+                                <input type="text" class="form-control" name="gyrXLowerThreshold" value="-20000" data-validation="number" data-validation-allowing="range[-30000.0;30000.0],float,negative" />
+
+                            </div>
+                            <div class="input-group col-md-5 col-lg-5 pull-left">
+                                <span class="input-group-addon" id="basic-addon1">Gyr Y Upper Threshold</span>
+                                <input type="text" class="form-control" name="gyrYUpperThreshold" value="20000" data-validation="number" data-validation-allowing="range[-30000.0;30000.0],float,negative" />
+                            </div>
+                            <div class="input-group col-md-5 col-lg-5 pull-left">
+                                <span class="input-group-addon" id="basic-addon1">Gyr Y Lower Threshold</span>
+                                <input type="text" class="form-control" name="gyrYLowerThreshold" value="-20000" data-validation="number" data-validation-allowing="range[-30000.0;30000.0],float,negative" />
+
+                            </div>
+                            <div class="input-group col-md-5 col-lg-5 pull-left">
+                                <span class="input-group-addon" id="basic-addon1">Gyr Z Upper Threshold</span>
+                                <input type="text" class="form-control" name="gyrZUpperThreshold" value="20000" data-validation="number" data-validation-allowing="range[-30000.0;30000.0],float,negative" />
+                            </div>
+                            <div class="input-group col-md-5 col-lg-5 pull-left">
+                                <span class="input-group-addon" id="basic-addon1">Gyr Z Lower Threshold</span>
+                                <input type="text" class="form-control" name="gyrZLowerThreshold" value="-20000" data-validation="number" data-validation-allowing="range[-30000.0;30000.0],float,negative" />
+                            </div>
+                            <div class="input-group col-md-1 col-lg-1 pull-left">
+                                <input type="submit" class="btn btn-primary" value="Save" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div id="chartGyroscopeContainer" class="chartContainer"></div>
+                </div>
+                <div class="row">
+                    <div id="tableAlarmsContainerGyroscope" class="tableContainer">
+                        <div class="col-md-12 bold" style="font-size:large;">
+                            Real time alerts to device
+                        </div>
+                        <div class="table-editable">
+                            <table class="table" id="table_Alarm_Gyroscope">
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Device</th>
+                                    <th>Alert</th>
+                                    <th>Message</th>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var x = 0;
+    var y_temp = 33.12;
+    var y_hum = 20;
+
+    var acc_x = 0, acc_y = 0, acc_z = 0;
+    var gyr_x = 0, gyr_y = 0, gyr_z = 0;
+
+    var alert_type = "TEMPERATURE";
+    var message = "High temperature (Alarm)";
+
+    var thresholdValues = {
+        'tempThreshold': 30,
+        'humThreshold': 50,
+        'accXUpperThreshold': 1100,
+        'accXLowerThreshold': -1100,
+        'accYUpperThreshold': 1100,
+        'accYLowerThreshold': -1100,
+        'accZUpperThreshold': 1100,
+        'accZLowerThreshold': -1100,
+        'gyrXUpperThreshold': 20000,
+        'gyrXLowerThreshold': -20000,
+        'gyrYUpperThreshold': 20000,
+        'gyrYLowerThreshold': -20000,
+        'gyrZUpperThreshold': 20000,
+        'gyrZLowerThreshold': -20000
+    };
+
+
+    var AvgSumTemp = y_temp * AvgCamp;
+    var AvgSumHum = y_hum * AvgCamp;
+    var AvgInst_Temp = 0;
+    var AvgInst_Hum = 0;
+    var AlarmLine = 33.5;
+
+    var AvgCount = AvgCamp;
+
+    $(document).ready(function () {
+
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            graphRender(e.currentTarget.hash);
+        })
+
+        $.validate({
+            onSuccess: function ($form) {
+                return false; // Will stop the submission of the form
+            },
+            onElementValidate: function (valid, $el, $form, errorMess) {
+                if (valid) {
+                    thresholdValues[$el.attr("name")] = parseInt($el.val());
+                    setTimeout(function () {
+                        $el.removeClass("valid");
+                    }, 1000);
+                } else {
+                }
+            },
+            scrollToTopOnError: false,
+            errorMessagePosition: "top",
+            validateOnBlur: false
+        });
+
+    });
+
+    function updatevalueTemperature() {
+
+        showTemperatureChart(true);
+
+        if (AvgCount >= AvgCamp) {
+            AvgInst_Temp = AvgSumTemp / AvgCamp;
+
+            addTemperatureAvgValue(x, AvgInst_Temp);
+
+            AvgSumTemp = 0;
+        }
+
+        AvgSumTemp = AvgSumTemp + y_temp;
+
+        addTemperatureValue(x, y_temp);
+
+        if (y_temp > thresholdValues["tempThreshold"]) {
+            addTemperatureAlarmValue(x, y_temp, macAddress, alert_type, message);
+        }
+
+        y_temp = y_temp + (Math.random() - 0.5);
+    }
+
+
+    function updatevalueHumidity() {
+
+        showHumidityChart(true);
+
+        if (AvgCount >= AvgCamp) {
+            AvgInst_Hum = AvgSumHum / AvgCamp;
+
+            addHumidityAvgValue(x, AvgInst_Hum);
+
+            AvgSumHum = 0;
+        }
+
+        AvgSumHum = AvgSumHum + y_hum;
+
+        addHumidityValue(x, y_hum);
+        y_hum = y_hum + (Math.random() - 0.5);
+    }
+
+    function updatevalueAccelerometer() {
+
+        showAccelerometerChart(true);
+
+        acc_x = (Math.random() - 0.5);
+        acc_y = (Math.random() - 0.5);
+        acc_z = (Math.random() - 0.5);
+
+        addAccValue(x, acc_x, acc_y, acc_z);
+    }
+
+
+    function updatevalueGyroscope() {
+
+        showGyroscopeChart(true);
+
+        gyr_x = (Math.random() - 0.5);
+        gyr_y = (Math.random() - 0.5);
+        gyr_z = (Math.random() - 0.5);
+
+        addGyrValue(x, gyr_x, gyr_y, gyr_z);
+    }
+
+
+
+
+    function updatevalue() {
+        //updatevalueTemperature();
+        updatevalueHumidity();
+        updatevalueAccelerometer();
+        updatevalueGyroscope();
+
+        if (AvgCount >= AvgCamp) {
+            AvgCount = 0;
+        }
+
+        AvgCount++;
+        x = x + 1;
+    }
+
+</script>

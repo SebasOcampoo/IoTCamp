@@ -1,0 +1,201 @@
+﻿@model CTDWeb.Models.HomeModel
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<script type="text/javascript" src="~/Scripts/CTDUtils.js"></script>
+<script type="text/javascript" src="~/Scripts/charts/charts.js"></script>
+<script type="text/javascript" src="~/Scripts/speech.1.0.0.js"></script>
+
+<div class="body-charts" style="background:#FFFFFF;">
+    <div class="row">
+            <div class="row">
+                <div id="macHidden" class="col-md-12">
+                    <div class="col-md-12 device-name">
+                        <h4 class="bold">
+                            Device name:
+                        </h4>
+                        <h4 id="containerName">
+                            @Model.MAC
+                        </h4>
+                    </div>
+                    <div class="col-md-6 control-device" >
+                        <div class="col-md-12">
+                            <h4 class="bold">Control device</h4>
+                        </div>
+
+                        <div class="row">
+                            <div class="input-group col-md-9">
+                                <span class="input-group-addon" id="basic-addon1">Message to device</span>
+                                <input type="text" id="c2dMessage" value="alarm" class="form-control" placeholder="Message to device"/>
+                            </div>
+                            <div class="col-md-3">
+                                <button value="Send" class="btn btn-primary" onclick="sendMessageToDevice($('#c2dMessage').val())">Send</button>
+                            </div>
+                        </div>
+
+                        <div class="register-message-container">
+                            <button value="Send" id="mic" class="btn btn-circle microphone" onclick="startSpeechToText()">Register</button>
+                            <div class="register-message-text-container">
+                                <div id="speech_api_output">Click to register a message for device</div>
+                                <div id="timer-show"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="col-md-12">
+                            <h4 class="bold">Device status</h4>
+                        </div>
+                        <ul class="device-status-bullets">
+                            <li class="device-connection">
+                                <span class="bullet disconnected"></span>
+                                <span class="bullet-text">Disconnected</span>
+                            </li>
+                            <li class="device-status">
+                                <span class="bullet enabled"></span>
+                                <span class="bullet-text">Enabled</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+    </div>
+    <div class="row" id="chartsDiv">
+        <div class="col-md-12">
+            <h4 class="bold">Live sensor data from device</h4>
+        </div>
+        @Html.Partial("_Charts")
+    </div>
+
+</div>
+
+<script>
+    var savePositionURL = '@Model.API_URL';
+    //console.log(savePositionURL);
+    $(document).ready(function () {
+        if ('@Model.MAC' != "") {
+            macAddress = '@Model.MAC';
+            registerSignalRClient(macAddress, $("#chartsDiv"));
+            saveLocation(macAddress);
+            $('#macHidden').fadeIn(1000);
+        }
+
+        deviceStatus = '@Model.Status';
+
+        if (deviceStatus == "") {
+            deviceStatus = 'unknown'
+        }
+
+        changeDeviceStatus(deviceStatus);
+    });
+
+    /******************
+     * SPEECH TO TEXT *
+     ******************/
+    var client;
+    var request;
+    var registerTimeMs = 3000;
+
+    function timer(ms, callback) {
+        var elem = document.getElementById("timer-show");
+        var initialWidth = 100;
+        var width = initialWidth;
+        var intervalDelay = 10;
+        var intervalId = setInterval(frame, intervalDelay);
+
+        var widthStepsWidth = initialWidth / (ms / intervalDelay);
+
+        function frame() {
+            if (width <= 0) {
+                clearInterval(intervalId);
+                elem.style.width = "";
+                callback();
+            } else {
+                width -= widthStepsWidth;
+                elem.style.width = width + '%';
+            }
+        }
+    }
+
+    function getMode() {
+        return Microsoft.CognitiveServices.SpeechRecognition.SpeechRecognitionMode.shortPhrase;
+    }
+
+    function getKey() {
+        return '@Model.BING_SPEECH_API_KEY';
+    }
+
+    function getLanguage() {
+        return "it-it";
+    }
+
+    function setTranscriptText(text) {
+        $("#speech_api_output").text(text);
+    }
+
+    function setIntentText(text) {
+        $("#c2dMessage").val(text);
+    }
+
+    function clearText() {
+        setTranscriptText('');
+        setIntentText('');
+    }
+
+    function getLuisConfig() {
+        var appid = '@Model.LUIS_APP_ID';
+        var subid = '@Model.LUIS_SUBSCRIPTION_ID';
+
+        if (appid && subid && appid.length > 0 && subid.length > 0) {
+            return { appid: appid, subid: subid };
+        }
+
+        return null;
+    }
+
+    function startSpeechToText() {
+        var mode = getMode();
+        var luisCfg = getLuisConfig();
+
+        clearText();
+
+        if (luisCfg) {
+            client = Microsoft.CognitiveServices.SpeechRecognition.SpeechRecognitionServiceFactory.createMicrophoneClientWithIntent(
+                getLanguage(),
+                getKey(),
+                luisCfg.appid,
+                luisCfg.subid);
+        } else {
+            client = Microsoft.CognitiveServices.SpeechRecognition.SpeechRecognitionServiceFactory.createMicrophoneClient(
+                mode,
+                getLanguage(),
+                getKey());
+        }
+        client.startMicAndRecognition();
+        $('#mic').addClass('listening');
+
+        timer(registerTimeMs,
+            function() {
+                client.endMicAndRecognition();
+                $('#mic').removeClass('listening');
+            });
+
+        client.onPartialResponseReceived = function (response) {
+            setTranscriptText(response);
+        }
+
+        client.onFinalResponseReceived = function (response) {
+            console.log("SPEECH_TO_TEXT FINAL RESPONSE", response);
+            if(response && response[0] && response[0].transcript)
+                setTranscriptText(response[0].transcript);
+        }
+
+        client.onIntentReceived = function (response) {
+            var responseJSON = JSON.parse(response);
+            console.log("SPEECH_TO_TEXT INTENT RECEIVED", responseJSON);
+            if (responseJSON && responseJSON.intents && responseJSON.intents[0] && responseJSON.intents[0].score > 0.5)
+                setIntentText(responseJSON.intents[0].intent);
+        };
+    }
+</script>
+
