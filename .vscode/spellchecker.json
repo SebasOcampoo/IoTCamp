@@ -1,0 +1,23 @@
+{
+    "language": "en_US",
+    "ignoreWordsList": [
+        "TODO",
+        "IOTHUB",
+        "WebApp",
+        "IoTHub",
+        "StreamAnalytics",
+        "webjob",
+        "webapp",
+        "streamAnalytics",
+        "ServiceBus",
+        "EventHub"
+    ],
+    "documentTypes": [
+        "markdown",
+        "latex",
+        "plaintext"
+    ],
+    "ignoreRegExp": [],
+    "ignoreFileExtensions": [],
+    "checkInterval": 5000
+}

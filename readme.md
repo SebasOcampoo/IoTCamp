@@ -8,13 +8,20 @@ Folders:
 * Utilities: script and other
 
 
-In order to test:
+In order to test FinalProjects:
 
-* clone this repository
-* configure your connection strings as described in the projects' readme
+* Clone this repository
+* Follow [this](FinalProjects) instructions to create the cloud infrastructure and configure the projects
+* Run the project!
 
+In order to complete the demo:
 
-Use the following commad to avoid committing config files
+* Clone this repository
+* Start from InitialProjects
+* Complete the code, create the cloud infrastructure and configure your projects following [this](InitialProjects) instructions
+* Run your project!
+
+Use the following commad to avoid committing config file:
 
 ```
 git update-index --assume-unchanged InitialProjects/*/*.config
