@@ -102,7 +102,13 @@ We use EntityFramework as ORM (more info [here](https://msdn.microsoft.com/en-us
 IMAGE
 ```
 
-### Input
+### Define input sources
+The job will create and open the job page. Or you can click the created analytics job on the portal dashboard.
+
+Click the INPUTS tab to define the source data.
+
+
+
     * IoTHub (named IoTHubDM)
 Images and documentation.
 
@@ -113,6 +119,8 @@ Images and documentation.
 
 ### Query
 You can find the final query below or [here](../Utilities/StreamAnalyticsQuery.sql).
+
+Documentation on Azure StreamAnalytics Query Language [here](https://msdn.microsoft.com/en-us/library/azure/dn834998.aspx).
 
 ```sql
 -- IoTHubDM -> StreamAnalytics -> Service Bus Queue (Queue)
