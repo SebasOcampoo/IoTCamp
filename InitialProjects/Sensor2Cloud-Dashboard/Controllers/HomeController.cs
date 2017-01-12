@@ -22,54 +22,21 @@ namespace CTDWeb.Controllers
 
         public async Task<ActionResult> Index(string id)
         {
+            // Dashboard
+
             HomeModel model = new HomeModel();
 
-            model.API_URL = CloudConfigurationManager.GetSetting("API.URL");
-            model.BING_SPEECH_API_KEY = CloudConfigurationManager.GetSetting("BING_SPEECH_API_KEY");
-            model.LUIS_APP_ID = CloudConfigurationManager.GetSetting("LUIS_APP_ID");
-            model.LUIS_SUBSCRIPTION_ID = CloudConfigurationManager.GetSetting("LUIS_SUBSCRIPTION_ID");
+            // LOAD SETTING HERE
 
-            if (id != null)
-            {
-                model.MAC = id.ToUpper();
-                //Store the mac address to a session
-                Session["MAC"] = id;
-
-                var twin = await _deviceManager.GetTwin(id);
-                string status = string.Empty;
-
-                if (twin == null) // probably device not registered
-                {
-                    model.Status = status;
-                }
-                else
-                {
-                    try
-                    {
-                        status = twin.Properties.Desired["status"];
-                    }
-                    catch (ArgumentOutOfRangeException ex)
-                    {
-                        // this device has not status property
-                        twin = await SetDefaultStatus(id, twin.ETag);
-                        status = twin.Properties.Desired["status"];
-                    }
-                    finally
-                    {
-                        model.Status = status;
-                    }
-                }
-            }
-            else
-            {
-                return RedirectToAction("Insert", "Home");
-            }
+            // CHECK DEVICE STATUS HERE
 
             return View(model);
         }
 
         public ActionResult Insert()
         {
+            // Home page
+
             InsertModel model = new InsertModel()
             {
                 MAC1 = "",
@@ -97,6 +64,7 @@ namespace CTDWeb.Controllers
 
         public ActionResult About()
         {
+            // About page
             ViewBag.Message = "Your application description page.";
 
             return View();
@@ -105,21 +73,7 @@ namespace CTDWeb.Controllers
 
         private async Task<Twin> SetDefaultStatus(string macAddress, string etag)
         {
-            Console.WriteLine("no status -> enabled");
-
-            var path = new
-            {
-                properties = new
-                {
-                    desired = new
-                    {
-                        status = "enabled"
-                    }
-                }
-            };
-
-            var twin = await _deviceManager.UpdateTwin(macAddress, JsonConvert.SerializeObject(path), etag);
-            return twin;
+            // SET DEVICE STATUS HERE
         }
     }
 }

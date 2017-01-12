@@ -34,24 +34,7 @@ namespace WebJob_EnableDevices
 
         private static bool VerifyConfiguration()
         {
-            string webJobsDashboard = ConfigurationManager.ConnectionStrings["AzureWebJobsDashboard"].ConnectionString;
-            string webJobsStorage = ConfigurationManager.ConnectionStrings["AzureWebJobsStorage"].ConnectionString;
-            string iotHubConnectionString = ConfigurationManager.ConnectionStrings["Microsoft.Azure.IoTHub.ConnectionString.Service"].ConnectionString;
-
-            bool configOK = true;
-            if (string.IsNullOrWhiteSpace(webJobsDashboard) || string.IsNullOrWhiteSpace(webJobsStorage))
-            {
-                configOK = false;
-                Console.WriteLine("Please add the Azure Storage account credentials in App.config");
-            }
-
-            if (string.IsNullOrWhiteSpace(iotHubConnectionString))
-            {
-                configOK = false;
-                Console.WriteLine("Please add your Iot Hub connection string in App.config");
-            }
-
-            return configOK;
+            // VERIFY CONFIGURATION HERE
         }
     }
     public class DIJobActivator : IJobActivator

@@ -22,8 +22,7 @@ namespace WebJob_EnableDevices
         // Triggers every day at 00:00:00
         public async void CronJob([TimerTrigger("0 0 0 * * *")] TimerInfo timer, TextWriter log)
         {
-            await _deviceManager.enableAll();
-            EnableAllStatus();
+            // ENABLE DEVICES HERE
         }
 
         // --- TEST enable devices ---
@@ -37,27 +36,7 @@ namespace WebJob_EnableDevices
 
         private async void EnableAllStatus()
         {
-            var query = _deviceManager.CreateQuery("SELECT * FROM devices WHERE properties.desired.status IN ['disabled', 'warning']", 1000);
-
-            while (query.HasMoreResults)
-            {
-                var page = await query.GetNextAsTwinAsync();
-                foreach (var twin in page)
-                {
-                    var patch = new
-                    {
-                        properties = new
-                        {
-                            desired = new
-                            {
-                                status = "enabled"
-                            }
-                        }
-                    };
-
-                    await _deviceManager.UpdateTwin(twin.DeviceId, JsonConvert.SerializeObject(patch), twin.ETag);
-                }
-            }
+            // ENABLE ALL DEVICES TWIN HERE
         }
     }
 }
