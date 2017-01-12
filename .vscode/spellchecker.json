@@ -14,7 +14,9 @@
         "streamAnalytics",
         "ServiceBus",
         "EventHub",
-        "StreamAnalyticsQuery"
+        "StreamAnalyticsQuery",
+        "streamanalytics",
+        "IotHub"
     ],
     "documentTypes": [
         "markdown",
