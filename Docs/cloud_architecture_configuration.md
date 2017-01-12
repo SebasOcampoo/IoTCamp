@@ -54,8 +54,9 @@ ARCHITECTURE IMAGE
 
 
 ## Configure ServiceBus Queue
-
-
+    * NS Shared access policies 
+        * webjob
+        * streamAnalytics
 
 
 ## Configure StreamAnalytics
@@ -65,15 +66,18 @@ IMAGE
 ```
 
 ### Input
-
-
+    * IoTHub (named IoTHubDM)
+Images and documentation.
 
 ### Output
-
-
+    * EventHub (named ehOut)
+    * ServiceBus Queue (named Queue)
+    * SQL Database (named SQL)
 
 ### Query
+You can find the final query [here](../Utilities/StreamAnalyticsQuery.sql).
 
+{% include_relative ../Utilities/StreamAnalyticsQuery.sql %}
 
 
 

@@ -3,7 +3,7 @@ Sensor2Cloud projects' folder.
 First of we are going to create the Azure architecture:
 
 * Login in the [Azure Portal](https://portal.azure.com) 
-* Follow [this](../Docs/cloud_arhcitecture_configuration) instructions
+* Follow [this](../Docs/cloud_architecture_configuration.md) instructions
 
 
 At last we can publish our services, follow markdown files in this order:

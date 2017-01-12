@@ -3,18 +3,9 @@
     "ignoreWordsList": [
         "webjob",
         "Sensor2Cloud",
+        "WebJob",
         "EnableDevices",
-        "NotifyDevices",
-        "TODO",
-        "IOTHUB",
-        "WebApp",
-        "IoTHub",
-        "StreamAnalytics",
-        "webapp",
-        "streamAnalytics",
-        "ServiceBus",
-        "EventHub",
-        "StreamAnalyticsQuery"
+        "NotifyDevices"
     ],
     "documentTypes": [
         "markdown",
