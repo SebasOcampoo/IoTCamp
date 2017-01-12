@@ -15,8 +15,10 @@ At the beginning you need to create all the following Azure resources:
 * `Azure StreamAnalytics` ([official guide](https://docs.microsoft.com/en-us/azure/stream-analytics/stream-analytics-create-a-job))
 * `Azure WebApp` ([official guide](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-web-how-to-create-a-web-app-in-an-ase))
     * to deploy the *dashboard*
+    * enable *'WEB SOCKETS'* and *'ALWAYS ON'* from ApplicationSettings (more details [here](https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure))
 * `Azure ApiApp` ([overview](https://docs.microsoft.com/en-us/azure/app-service-api/app-service-api-apps-why-best-platform) | [example](https://docs.microsoft.com/en-us/azure/app-service-api/app-service-api-dotnet-get-started))
     * to deploy the *registration api*
+    * enable *'ALWAYS ON'* from ApplicationSettings (more details [here](https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure))
     * use the same App Service Plan (more info [here](https://docs.microsoft.com/en-us/azure/app-service/app-service-value-prop-what-is)) of the WebApp
 * `Azure SQL Database`  ([official guide](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-get-started)
                         | [create more servers](https://github.com/Microsoft/azure-docs/blob/master/articles/sql-database/sql-database-create-servers.md)
@@ -284,8 +286,11 @@ Put your application insights instrumental key in the `ApplicationInsights.confi
 
 ### Test
 
+Run in VisualStudio.
+
 
 ### Publish
+
 Deploy this project in the Azure WebApp created before, using VisualStudio.
 
 
@@ -308,6 +313,7 @@ Put your application insights instrumental key in the `ApplicationInsights.confi
 
 ### Test
 
+Run in VisualStudio and open Swagger UI (/swagger) to test your APIs. More info on Swagger [here](https://docs.microsoft.com/en-us/azure/app-service-api/app-service-api-dotnet-get-started#use-swagger-api-metadata-and-ui).
 
 
 ### Publish
@@ -341,11 +347,12 @@ Update the `queuename` app setting in the `App.config` file:
 
 ### Test
 
+Run in VisualStudio and add message to the queue to trigger the functions. 
 
+To add test message to the you can create a console application like [this](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-java-how-to-use-queues#send-messages-to-a-queue).
 
 ### Publish
 Deploy this project as Azure WebJob in the Azure API App created before, using VisualStudio.
-
 
 
 
@@ -366,6 +373,7 @@ Put your connection strings in the `App.config` file:
 
 ### Test
 
+You can run this WebJob in VisualStudio.
 
 
 ### Publish
@@ -374,4 +382,7 @@ Deploy this project as Azure WebJob in the Azure API App created before, using V
 
 
 ## SETUP APPSETTINGS IN THE AZURE PORTAL 
+
 If you want, you can override your AppSettings and ConnectionString through the Azure Portal. 
+
+More details [here](https://azure.microsoft.com/en-us/blog/windows-azure-web-sites-how-application-strings-and-connection-strings-work/) and [here](https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure).
