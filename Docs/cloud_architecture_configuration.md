@@ -77,7 +77,7 @@ Images and documentation.
 ### Query
 You can find the final query [here](../Utilities/StreamAnalyticsQuery.sql).
 
-{% include_relative ../Utilities/StreamAnalyticsQuery.sql %}
+{% include ../Utilities/StreamAnalyticsQuery.sql %}
 
 
 
