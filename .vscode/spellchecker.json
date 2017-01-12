@@ -34,7 +34,13 @@
         "ehOut",
         "UTF8",
         "IoTHubDM",
-        "FinalProjects"
+        "FinalProjects",
+        "ConnectionStrings",
+        "AppSettings",
+        "ApplicationSettings",
+        "luis",
+        "APIs",
+        "APPSETTINGS"
     ],
     "documentTypes": [
         "markdown",
