@@ -1,7 +1,7 @@
 ﻿
 Put your connection strings in the `Web.config` file:
 
-```
+```xml
 <appSettings>
 	<add key="Microsoft.ServiceBus.EventHubDevices" value="<EventHub name>" />
 	<add key="Microsoft.ServiceBus.EventHubDevices.PartitionCount" value="<EventHub partition count>" />
@@ -20,7 +20,7 @@ Put your connection strings in the `Web.config` file:
 
 Put your application insights instrumental key in the `ApplicationInsights.config` file
 
-```
+```xml
 <InstrumentationKey>Your Application Insights key</InstrumentationKey>
 ```
 
