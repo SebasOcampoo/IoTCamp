@@ -88,9 +88,11 @@ We use EntityFramework as ORM (more info [here](https://msdn.microsoft.com/en-us
 1. Take note of the Database connetion string, [here](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-get-started#view-database-properties-in-the-azure-portal) is explained how to find it in the Azure portal.
 2. Open the solution in VisualStudio and open **API** project.
 3. Put your connection string in `Web.config` file
+
     ```
     <add name="Sensor2CloudContext" connectionString="<SQL DB ConnectionString>" providerName="System.Data.SqlClient" />
     ```
+    
 4. Restore **Nuget packages** of the project 
 5. Open **Package Manager Console** in VisualStudio and run `Update-Database` (more info [here](https://www.asp.net/mvc/overview/getting-started/getting-started-with-ef-using-mvc/migrations-and-deployment-with-the-entity-framework-in-an-asp-net-mvc-application))
 
