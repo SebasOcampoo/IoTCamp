@@ -1,4 +1,4 @@
-# CLOUD ARCHITECTURE
+# CLOUD ARCHITECTURE (First version - Now it's moved [here](../FinalProjects/))
 
 REQUIREMENTS: you must be logged in your Azure subscription
 
@@ -24,9 +24,8 @@ All resources must be in the same subscription and region.
 
 Now we're going to create the cloud infrastructure connecting our services.
 
-```
-ARCHITECTURE IMAGE
-```
+![Registration architecture](../Docs/images/registration.png)
+![Registration architecture](../Docs/images/overall_architecture.png)
 
 ## 1. Configure IoTHub 
 We need to configure the **Messaging Endpoint** Consumer Group.
@@ -51,14 +50,14 @@ We need to configure the **Messaging Endpoint** Consumer Group.
         * Name: webapp
         * Permissions: Listen
     
-        * Create one access policy for the **StreamAnalytics** with the following features:
+    * Create one access policy for the **StreamAnalytics** with the following features:
         * Name: streamanalytics
         * Permissions: Send
 
 2. Add **Consumer Groups** to the EventHub
     * Go in the Event Hub specific blade, click **Consumer Group**, and then click **+ Consumer Group**.
 
-        ![Eventhub consumer groups](../Docs/images/event_hub_consumer_group.png)
+        ![EventHub consumer groups](../Docs/images/event_hub_consumer_group.png)
 
     * Create two Consumer Groups
         * **local** for local testing environment
@@ -76,7 +75,7 @@ We now add Shared Access Policies to the ** ServiceBus Queue's Namespace**
     * Name: webjob
     * Permissions: Listen
 
-    * Create one access policy for the **StreamAnalytics** with the following features:
+3. Create one access policy for the **StreamAnalytics** with the following features:
     * Name: streamanalytics
     * Permissions: Send
 
@@ -85,7 +84,7 @@ We now add Shared Access Policies to the ** ServiceBus Queue's Namespace**
 Now we're going to create the database structure.
 We use EntityFramework as ORM (more info [here](https://msdn.microsoft.com/en-us/library/bb399567.aspx)).
 
-1. Take note of the Database connetion string, [here](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-get-started#view-database-properties-in-the-azure-portal) is explained how to find it in the Azure portal.
+1. Take note of the Database connection string, [here](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-get-started#view-database-properties-in-the-azure-portal) is explained how to find it in the Azure portal.
 2. Open the solution in VisualStudio and open **API** project.
 3. Put your connection string in `Web.config` file
 
@@ -98,26 +97,90 @@ We use EntityFramework as ORM (more info [here](https://msdn.microsoft.com/en-us
 
 ## 5. Configure StreamAnalytics
 
-```
-IMAGE
-```
+![StreamAnalytics architecture](../Docs/images/sa_io.png)
 
 ### Define input sources
-The job will create and open the job page. Or you can click the created analytics job on the portal dashboard.
+1. You can click the created analytics job on the portal dashboard.
 
-Click the INPUTS tab to define the source data.
+2. Click the **INPUTS** tab to define the source data.
+
+3. Click **ADD**.
+
+    ![StreamAnalytics create input](../Docs/images/sa_input.png)
+
+4. Enter *IoTHubDM* as **INPUT ALIAS**
+
+5. Source Type is Data Stream
+
+6. Source is *IotHub*.
+
+7. IotHub name should be set to name you choose before.
+
+8. IotHub policy name is, at least, *service*.
+
+9. IotHub consumer group is *streamanalytics* (the one created before).
+
+10. Select *JSON* for **EVENT SERIALIZATION FORMAT** and *UTF8* for **ENCODING**.
+
+    ![StreamAnalytics create input](../Docs/images/sa_input_iothub.png)
+
+    Click Create to finish the wizard. Now all inputs are defined.
 
 
+### Define outputs
+1. On the Stream Analytics job overview pane, select OUTPUTS.
 
-    * IoTHub (named IoTHubDM)
-Images and documentation.
+2. Click Add.
 
-### Output
-    * EventHub (named ehOut)
-    * ServiceBus Queue (named Queue)
-    * SQL Database (named SQL)
+    ![StreamAnalytics create input](../Docs/images/sa_output.png)
+
+3. Add EventHub
+    * Set the Output alias to *'ehOut'* and then Sink to EventHub.
+    * Select the ServiceBus Namespace and the EventHub name that you created earlier.
+    * Use *'id'* as Partition key column. This is because messages processed by the StreamAnalytics Job have a field called *id* that identify the device. (Look at the query above and [here](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-overview#partitions) for more info about partitioning)
+    * Select *JSON* for **EVENT SERIALIZATION FORMAT**, *UTF-8* for **ENCODING** and *Array* for **Format**.
+    * Click Create to finish the wizard.
+
+    ![StreamAnalytics create input](../Docs/images/sa_output_eh.png)
+
+4. Add ServiceBus Queue
+    * Set the Output alias to *'Queue'* and then Sink to Service bus Queue.
+    * Select the ServiceBus name and the Queue name that you created earlier.
+    * Select *JSON* for **EVENT SERIALIZATION FORMAT**, *UTF-8* for **ENCODING** and *Array* for **Format**.
+    * Click Create to finish the wizard.
+
+    ![StreamAnalytics create input](../Docs/images/sa_output_queue.png)
+
+5. Add SQL Database
+    * Set the Output alias to 'SQL' and then Sink to SQL database.
+    * Select the server name that was created earlier.
+    * Enter USERNAME and PASSWORD fields that was chosen before.
+    * Enter *'Devices'* as the TABLE field.
+    * Click Create to finish the wizard.
+
+    ![StreamAnalytics create input](../Docs/images/sa_output_sql.png)
+
+Now all outputs are defined.
 
 ### Query
+First of all we need to remember the format of the messages we receive from devices:
+
+```javascript
+{
+    "id": "Device MAC address",
+    "name": "Device name",
+    "ts": "UTC Timestamp ",
+    "temp": "temperature",
+    "hum": "humidity",
+    "accX": "accelerometer x",
+    "accY": "accelerometer y",
+    "accZ": "accelerometer z",
+    "gyrX": "gyroscope x",
+    "gyrY": "gyroscope y",
+    "gyrZ": "gyroscope z"
+}
+```
+
 You can find the final query below or [here](../Utilities/StreamAnalyticsQuery.sql).
 
 Documentation on Azure StreamAnalytics Query Language [here](https://msdn.microsoft.com/en-us/library/azure/dn834998.aspx).
@@ -156,6 +219,9 @@ INTO Queue
 FROM IoTHubDM
 GROUP BY IoTHub.ConnectionDeviceId, TumblingWindow(second, 60)
 ```
+
+
+You can find another example [here]https://docs.microsoft.com/en-us/azure/stream-analytics/stream-analytics-build-an-iot-solution-using-stream-analytics).
 
 ## 6. Start services
 Now we are ready to start the services.
