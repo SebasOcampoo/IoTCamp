@@ -12,12 +12,7 @@ namespace WebJob_EnableDevices
 {
     public class Functions
     {
-        private readonly IDeviceManager _deviceManager;
-
-        public Functions(IDeviceManager deviceManager)
-        {
-            _deviceManager = deviceManager;
-        }
+        // INSTANTIATE DEVICE MANAGER
 
         // Triggers every day at 00:00:00
         public async void CronJob([TimerTrigger("0 0 0 * * *")] TimerInfo timer, TextWriter log)

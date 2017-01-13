@@ -45,76 +45,7 @@ namespace WebJob_NotifyDevices
             [ServiceBusTrigger("%queueName%")] string message,
             TextWriter log)
         {
-            QueueReceivedMessage m = null;
-
-            try
-            {
-                m = JsonConvert.DeserializeObject<QueueReceivedMessage>(message);
-            }
-            catch (Exception)
-            {
-                log.WriteLine("Exception JSONConverter: " + message);
-            }
-
-            if (m != null)
-            {
-                log.WriteLine("SBQueue2IotHubDevice: " + m.MacAddress);
-
-                //var slowDownMessage = new C2DMessage()
-                //{
-                //    Type = "SlowDown",
-                //    Message = m.MessagesCount + " messages in the last hour",
-                //    TimeStamp = m.Timestamp
-                //};
-
-                var twin = await _deviceManager.GetTwin(m.MacAddress);
-                if (twin != null)
-                {
-                    try
-                    {
-                        var status = twin.Properties.Desired["status"];
-
-
-                        Console.WriteLine("Status {0}", status, Formatting.Indented);
-
-                        // Max number of messages only for non demo devices
-
-                        if (twin.Tags.Contains("demo") == false)
-                        {
-
-                            // State machine
-
-                            if (Convert.ToString(status) == "enabled" && m.MessagesCount > Threshold)
-                            {
-                                twin = await SetWarning(m.MacAddress, twin.ETag);
-                            }
-                            else if (Convert.ToString(status) == "warning" && m.MessagesCount > Threshold)
-                            {
-                                twin = await Disable(m.MacAddress, twin.ETag);
-                            }
-                            else if (Convert.ToString(status) == "warning" && m.MessagesCount < Threshold)
-                            {
-                                twin = await Enable(m.MacAddress, twin.ETag);
-                            }
-                        }
-
-                    }
-                    catch (ArgumentOutOfRangeException ex)
-                    {
-                        // this device has not status property
-                        twin = await SetDefaultStatus(m.MacAddress, twin.ETag);
-                    }
-                    catch (DeviceNotFoundException ex)
-                    {
-                        Console.WriteLine(ex);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex);
-                    }
-                }
-
-            }
+            // WRITE THE APPLICATION LOGIC TO CHANGE THE DEVICE STATUS HERE
         }
 
         private async Task<Twin> SetDefaultStatus(string macAddress, string etag)

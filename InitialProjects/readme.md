@@ -191,9 +191,93 @@ Now that we completed the server side code of the dashboard, we must restore the
 3. Click to *Restore* button on the page that will be opened
 
 
+# 2. WebJobs-Shared
+
+This class library project contains a device manager class that interact with the IoT Hub in order to manage the [device registry](https://docs.microsoft.com/it-it/azure/iot-hub/iot-hub-devguide-identity-registry).
+
+The methods implemented by this class can:
+- Enable or disable a device or a set of them. The events sent by a disabled device are rejected by the IoT Hub
+- Update the device properties saved on its twin
+
+1. Open the *IotHubDeviceManager* class
+2. Instantiate a *RegistryManager* class available in the Azure SDK
+
+```cs
+private RegistryManager _registryManager;
+
+public IotHubDeviceManager(string connectionString)
+{
+    _registryManager = RegistryManager.CreateFromConnectionString(connectionString);
+}
+```
+
+3. Implements the methods defined in the *IDeviceManager* interface
+
+```cs
+public async Task disable(string mac)
+{
+    var device = await _registryManager.GetDeviceAsync(mac);
+    device.Status = DeviceStatus.Disabled;
+    await _registryManager.UpdateDeviceAsync(device);
+}
+
+public async Task enable(string mac)
+{
+    var device = await _registryManager.GetDeviceAsync(mac);
+    device.Status = DeviceStatus.Enabled;
+    await _registryManager.UpdateDeviceAsync(device);
+}
+
+public async Task remove(string mac)
+{
+    await _registryManager.RemoveDeviceAsync(mac);
+}
+
+public async Task enableAll()
+{
+    var stats = await _registryManager.GetRegistryStatisticsAsync();
+    Console.WriteLine("device count: " + stats.TotalDeviceCount + " enabled: " + stats.EnabledDeviceCount + " disabled: " + stats.DisabledDeviceCount);
+    var devices = await _registryManager.GetDevicesAsync((int)stats.TotalDeviceCount * 100); // * 100 because the device list is an approximation 
+    devices = devices.Select(d => { d.Status = DeviceStatus.Enabled; return d; });
+    await _registryManager.UpdateDevices2Async(devices);
+}
+
+public async Task disableAll()
+{
+    var devices = await _registryManager.GetDevicesAsync(1);
+    devices.Select(d => { d.Status = DeviceStatus.Disabled; return d; });
+    await _registryManager.UpdateDevices2Async(devices);
+}
+
+#region Twin
+
+public IQuery CreateQuery(string query, int size)
+{
+    if (size != -1)
+        return _registryManager.CreateQuery(query, size);
+    else
+        return _registryManager.CreateQuery(query);
+}
+
+public async Task<Twin> GetTwin(string mac)
+{
+    var twin = await _registryManager.GetTwinAsync(mac);
+    return twin;
+}
+
+public async Task<Twin> UpdateTwin(string mac, string jsonTwinPatch, string etag)
+{
+    var twin = await _registryManager.UpdateTwinAsync(mac, jsonTwinPatch, etag);
+    return twin;
+}
+
+#endregion
+
+```
 
 
-# 2. WebJob-EnableDevices
+
+# 3. WebJob-EnableDevices
 
 A device can be disabled if reach the defined daily quota of messages it can send to the IoT Hub.
 So we need to check the status of each device registered in the IoT Hub at midnight and enable the previous disabled ones.  
@@ -241,6 +325,17 @@ private static bool VerifyConfiguration()
 
 The we can complete the *Functions.cs* file.
 
+By dependency injection get an instance of DeviceManager, that is responsible of all the communication with the IoT Hub.
+
+```cs
+private readonly IDeviceManager _deviceManager;
+
+public Functions(IDeviceManager deviceManager)
+{
+    _deviceManager = deviceManager;
+}
+```
+
 In the CronJob method we need to call the methods that call with the IoT Hub to enable the devices and to update their states on the corresponding twin:
 
 ```cs
@@ -281,4 +376,104 @@ private async void EnableAllStatus()
 ```
 
 In the *EnableAllStatus* method we get all the devices which status is *disabled* or *warning* but not the ones that are in the *enable* state.
+
+The job that every day call the iot hub to enable all the devices is now implemented.
+
+
+# 4. WebJob-NotifyDevices
+
+This web job change the status of each device that exceed the hourly quota of events it can send to the IoT Hub.
+
+The device status is implemented as a state machine, so every device can have 3 states:
+- **enabled**: it can send events to IoT Hub
+- **warning**: when it exceed the quota for the first time. It can continue to send events to IoT Hub but it is notified by the application to decrease the frequency
+- **disabled**: if the device exceed the quota 2 times consecutively it is disabled and it cannot send events until the next day
+
+
+The number of events sent from each device is counted by the Stream Analytics connected to the IoT Hub.
+Stream Analytics put a new message in a [Service Bus queue](https://azure.microsoft.com/en-us/services/service-bus/), for each device, every hour.
+The message contains the number of events of the specified device in the last hour.
+
+This web job is triggered one time for each new message that appear in the queue.
+
+1. Open *Function.cs* class
+2. Write the following code in the *SBQueue2IotHubDevice* method, that is triggered by a new service bus message and that check the device's status 
+
+```cs
+// Triggered when service bus receive message in a queue 
+public async void SBQueue2IotHubDevice(
+    [ServiceBusTrigger("%queueName%")] string message,
+    TextWriter log)
+{
+    QueueReceivedMessage m = null;
+
+    try
+    {
+        m = JsonConvert.DeserializeObject<QueueReceivedMessage>(message);
+    }
+    catch (Exception)
+    {
+        log.WriteLine("Exception JSONConverter: " + message);
+    }
+
+    if (m != null)
+    {
+        log.WriteLine("SBQueue2IotHubDevice: " + m.MacAddress);
+
+        var twin = await _deviceManager.GetTwin(m.MacAddress);
+        if (twin != null)
+        {
+            try
+            {
+                var status = twin.Properties.Desired["status"];
+
+
+                Console.WriteLine("Status {0}", status, Formatting.Indented);
+
+                // Max number of messages only for non demo devices
+
+                if (twin.Tags.Contains("demo") == false)
+                {
+
+                    // State machine
+
+                    if (Convert.ToString(status) == "enabled" && m.MessagesCount > Threshold)
+                    {
+                        twin = await SetWarning(m.MacAddress, twin.ETag);
+                    }
+                    else if (Convert.ToString(status) == "warning" && m.MessagesCount > Threshold)
+                    {
+                        twin = await Disable(m.MacAddress, twin.ETag);
+                    }
+                    else if (Convert.ToString(status) == "warning" && m.MessagesCount < Threshold)
+                    {
+                        twin = await Enable(m.MacAddress, twin.ETag);
+                    }
+                }
+
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                // this device has not status property
+                twin = await SetDefaultStatus(m.MacAddress, twin.ETag);
+            }
+            catch (DeviceNotFoundException ex)
+            {
+                Console.WriteLine(ex);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
+
+    }
+}
+```
+
+
+Your web job is now complete!
+
+
+
 
