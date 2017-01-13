@@ -251,6 +251,14 @@ In this task, you will sign up for the BING SPEECH and LUIS analytics service.
 Repeat the same steps to create Language Understanding Intelligent Service (LUIS) API.
 
 Now you can train your language model at [www.luis.ai/](https://www.luis.ai/). 
+
+We need to understand at least 2 intents:
+* *' led on '*
+* *' led off '*
+
+so let's train the model with some italian phrases that should pass that intentions.
+
+
 Follow [this](https://www.microsoft.com/cognitive-services/en-us/LUIS-api/documentation/GetStartedWithLUIS-Basics) link for further details.
 
 # PROJECTS CONFIGURATION

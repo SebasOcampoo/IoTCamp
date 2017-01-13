@@ -45,17 +45,17 @@ function getFromSessionStorage(key) {
 
 var SESSION_STORAGE_MAC_POSITION_KEY = "MAC_POSITION"
 
-function saveLocation(macAddress) {
+function saveLocation(macAddress, savePositionURL) {
     if (getFromSessionStorage(SESSION_STORAGE_MAC_POSITION_KEY) != macAddress) { // save position only 1 time per user's session
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((position) => { savePosition(macAddress, position) }, (error) => { handleError(macAddress, error) });
+            navigator.geolocation.getCurrentPosition((position) => { savePosition(macAddress, position, savePositionURL) }, (error) => { handleError(macAddress, error, savePositionURL) });
         } else {
             handleError({ code: "NOT_SUPPORTED" });
         }
     }
 }
 
-function savePosition(macAddress, position) {
+function savePosition(macAddress, position, savePositionURL) {
     var userData = {
         Longitude: position.coords.longitude,
         Latitude: position.coords.latitude,
@@ -68,7 +68,7 @@ function savePosition(macAddress, position) {
         //console.log( "Data Loaded: ",  data );
     });
 }
-function handleError(macAddress, error) {
+function handleError(macAddress, error, savePositionURL) {
     switch (error.code) {
         case error.PERMISSION_DENIED:
         case error.POSITION_UNAVAILABLE:

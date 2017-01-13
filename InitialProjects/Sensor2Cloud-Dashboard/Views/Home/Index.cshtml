@@ -76,7 +76,7 @@
         if ('@Model.MAC' != "") {
             macAddress = '@Model.MAC';
             registerSignalRClient(macAddress, $("#chartsDiv"));
-            saveLocation(macAddress);
+            saveLocation(macAddress, savePositionURL + (!savePositionURL.endsWith('/') ? '/' : '') + 'api/Users');
             $('#macHidden').fadeIn(1000);
         }
 
