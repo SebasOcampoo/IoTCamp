@@ -27,6 +27,7 @@ At the beginning you need to create all the following Azure resources:
 * `Azure EventHub` ([official guide](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-csharp-ephcs-getstarted))
 * `Azure ServiceBus Queue` ([official guide](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-dotnet-get-started-with-queues#2-create-a-queue-using-the-azure-portal))
     * [here](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-queues-topics-subscriptions) you can find a service overview
+* `Azure Storage Account` ([official guide](https://docs.microsoft.com/en-us/azure/storage/storage-create-storage-account))
 
 
 All resources must be in the same subscription and region. 
