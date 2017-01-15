@@ -4,7 +4,7 @@ Folders:
 
 * [Docs](/Docs): documentation and description
 * [InitialProjects](/InitialProjects): code to start the lab
-* [FinalProjects](/FinalProject): final projects
+* [FinalProjects](/FinalProjects): final projects
 * [Utilities](/Utilities): script and other
 
 
