@@ -1,4 +1,10 @@
-Sensor2Cloud official repository.
+This repo contains the docs and the hands on lab of the IoT Camp.
+
+Requirements for the hand on lab:
+
+* [Visual Studio Community 2015](https://go.microsoft.com/fwlink/?LinkId=691978&clcid=0x409)
+* [Microsoft Azure SDK for .NET](https://go.microsoft.com/fwlink/?LinkId=518003&clcid=0x410)
+* An active Azure subscription
 
 Folders:
 
