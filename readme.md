@@ -3,7 +3,7 @@ Sensor2Cloud official repository.
 Folders:
 
 * Docs: documentation and description
-* InitialProjects: code to start the lab
+* [InitialProjects](/InitialProjects): code to start the lab
 * FinalProjects: final projects
 * Utilities: script and other
 
