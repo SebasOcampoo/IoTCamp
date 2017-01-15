@@ -358,7 +358,7 @@ Update the `queuename` app setting in the `App.config` file:
 
 Run in VisualStudio and add message to the queue to trigger the functions. 
 
-To add test message to the you can create a console application like [this](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-java-how-to-use-queues#send-messages-to-a-queue).
+To add test message to the queue you can create a console application like [this](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-java-how-to-use-queues#send-messages-to-a-queue).
 
 ### Publish
 Deploy this project as Azure WebJob in the Azure API App created before, using VisualStudio.
