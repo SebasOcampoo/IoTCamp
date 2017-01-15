@@ -34,13 +34,8 @@
                             </div>
                         </div>
 
-                        <div class="register-message-container">
-                            <button value="Send" id="mic" class="btn btn-circle microphone" onclick="startSpeechToText()">Register</button>
-                            <div class="register-message-text-container">
-                                <div id="speech_api_output">Click to register a message for device</div>
-                                <div id="timer-show"></div>
-                            </div>
-                        </div>
+                        <!-- ADD THE HTML THAT SHOW THE MICROPHONE CONTROLS HERE-->
+
                     </div>
                     <div class="col-md-6">
                         <div class="col-md-12">
@@ -142,60 +137,9 @@
         setIntentText('');
     }
 
-    function getLuisConfig() {
-        var appid = '@Model.LUIS_APP_ID';
-        var subid = '@Model.LUIS_SUBSCRIPTION_ID';
+    // GET THE LUIS CONFIGURATION HERE
 
-        if (appid && subid && appid.length > 0 && subid.length > 0) {
-            return { appid: appid, subid: subid };
-        }
+    // WRITE THE speechToText FUNCRION HERE
 
-        return null;
-    }
-
-    function startSpeechToText() {
-        var mode = getMode();
-        var luisCfg = getLuisConfig();
-
-        clearText();
-
-        if (luisCfg) {
-            client = Microsoft.CognitiveServices.SpeechRecognition.SpeechRecognitionServiceFactory.createMicrophoneClientWithIntent(
-                getLanguage(),
-                getKey(),
-                luisCfg.appid,
-                luisCfg.subid);
-        } else {
-            client = Microsoft.CognitiveServices.SpeechRecognition.SpeechRecognitionServiceFactory.createMicrophoneClient(
-                mode,
-                getLanguage(),
-                getKey());
-        }
-        client.startMicAndRecognition();
-        $('#mic').addClass('listening');
-
-        timer(registerTimeMs,
-            function() {
-                client.endMicAndRecognition();
-                $('#mic').removeClass('listening');
-            });
-
-        client.onPartialResponseReceived = function (response) {
-            setTranscriptText(response);
-        }
-
-        client.onFinalResponseReceived = function (response) {
-            console.log("SPEECH_TO_TEXT FINAL RESPONSE", response);
-            if(response && response[0] && response[0].transcript)
-                setTranscriptText(response[0].transcript);
-        }
-
-        client.onIntentReceived = function (response) {
-            var responseJSON = JSON.parse(response);
-            console.log("SPEECH_TO_TEXT INTENT RECEIVED", responseJSON);
-            if (responseJSON && responseJSON.intents && responseJSON.intents[0] && responseJSON.intents[0].score > 0.5)
-                setIntentText(responseJSON.intents[0].intent);
-        };
-    }
 </script>
 

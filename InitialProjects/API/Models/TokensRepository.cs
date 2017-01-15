@@ -9,31 +9,16 @@ namespace API.Models
 {
     public class TokensRepository : ITokensRepository
     {
-        private RegistryManager registryManager;
+        // DEFINE THE REGISTRY MANAGER HERE
 
         public TokensRepository(string iothubConnectionString)
         {
-            registryManager = RegistryManager.CreateFromConnectionString(iothubConnectionString);
+            // INSTANTIATE THE REGISTRY MANAGER HERE
         }
 
         public async Task<IToken> Add(string deviceId, bool demo)
         {
-            try
-            {
-                Device device = await registryManager.AddDeviceAsync(new Device(deviceId));
-                var twin = await Enable(device.Id, demo);
-
-                return new IotHubToken()
-                {
-                    DeviceID = device.Id,
-                    Token = device.Authentication.SymmetricKey.PrimaryKey,
-                    Status = twin.Properties.Desired.Contains("status") ? twin.Properties.Desired["status"] : "Unknown"
-                };
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            // REGISTER A DEVICE HERE
         }
 
         private async Task<Twin> Enable(string id, bool demo)
@@ -84,19 +69,7 @@ namespace API.Models
         public async Task<IToken> Get(string deviceId)
         {
 
-            Device device = await registryManager.GetDeviceAsync(deviceId);
-
-            if (device == null)
-                return null;
-
-            var twin = await registryManager.GetTwinAsync(device.Id);
-
-            return new IotHubToken()
-            {
-                DeviceID = device.Id,
-                Token = device.Authentication.SymmetricKey.PrimaryKey,
-                Status = twin.Properties.Desired.Contains("status") ? twin.Properties.Desired["status"] : "Unknown"
-            };
+            // GET THE TOKEN OF A DEVICE HERE
 
         }
 
@@ -132,12 +105,7 @@ namespace API.Models
 
         public async Task Remove(string deviceId)
         {
-            Device device = await registryManager.GetDeviceAsync(deviceId);
-
-            if (device == null)
-                throw new DeviceNotFoundException(deviceId);
-
-            await registryManager.RemoveDeviceAsync(device);
+            // REMOVE A DEVICE HERE
         }
     }
 }

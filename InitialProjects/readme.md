@@ -1,40 +1,40 @@
 This folder contains the incomplete version of the Sensors2Cloud web application.
 
 The solution has got 5 projects:
-* Sensor2Cloud-Dashboard: [ASP.NET MVC](https://www.asp.net/mvc) web site that shows data coming from the devices in a dashboard
-* API: [ASP.NET Web API](https://www.asp.net/web-api) project that expose some REST services that the device can call in order to register itself to Sensors2Cloud
+* Sensor2Cloud-Dashboard: [ASP.NET MVC](https://www.asp.net/mvc) web site that shows data coming from the devices in a dashboard and allow user to send command to it
 * WebJob-EnableDevices: C# Console Application deployed as [Azure Web Job](https://goo.gl/xNK1Xz) that every day at midnight enable all the devices that are disabled in the IoT Hub
-* WebJob-NotifyDevices: C# Console Application deployed as [Azure Web Job](https://goo.gl/xNK1Xz) that change the status of the devices that exceed the maximum number of messages allowed
+* WebJob-NotifyDevices: C# Console Application deployed as [Azure Web Job](https://goo.gl/xNK1Xz) that change the status of the devices that exceed the maximum number of events they can send each hour
 * WebJobs-Shared: C# Class Library containing shared classes between the other web jobs projects
+* API: [ASP.NET Web API](https://www.asp.net/web-api) project that expose some REST services that the device can call in order to register itself to the IoT Hub
 
-You must complete the code in order to have the application working, following the instructions below.
+You must complete the code project by project, in order to have the application working, following the instructions below.
 
 
 # 1. Sensor2Cloud-Dashboard project
 
+## 1.1 Server side
 
-The .cs files in all the ASP.NET MVC projects like this one, contain the server side logic of the web application and its goal is to provide the web pages (.cshtml files) to the user.
+The .cs files in all the ASP.NET MVC projects like this one, contain the server side logic of the web application and its goal is to provide web pages (.cshtml files) to the user.
 
 The main class of this project is *HomeController.cs*, which contains some public methods called actions. Each action provide to the user browser a specific web page.
 For example the *Index* method of the *HomeController* return the web page *Index.cshtml* browsing the url `http://<domain>/Home/Index`.
 
 
-In the next steps we will fill the code of the *HomeController.cs* class.
+In the next steps we will complete the code of the *HomeController.cs* class.
 
-Load the settings for the configuration file of the project at the beginning of the *Index* method:
+1. Load the settings from the configuration file of the project at the beginning of the *Index* method:
 
 
 ```cs
-    // Load settings from web.config
-    model.API_URL = CloudConfigurationManager.GetSetting("API.URL");
-    model.BING_SPEECH_API_KEY = CloudConfigurationManager.GetSetting("BING_SPEECH_API_KEY");
-    model.LUIS_APP_ID = CloudConfigurationManager.GetSetting("LUIS_APP_ID");
-    model.LUIS_SUBSCRIPTION_ID = CloudConfigurationManager.GetSetting("LUIS_SUBSCRIPTION_ID");
+// Load settings from web.config
+model.API_URL = CloudConfigurationManager.GetSetting("API.URL");
+model.BING_SPEECH_API_KEY = CloudConfigurationManager.GetSetting("BING_SPEECH_API_KEY");
+model.LUIS_APP_ID = CloudConfigurationManager.GetSetting("LUIS_APP_ID");
+model.LUIS_SUBSCRIPTION_ID = CloudConfigurationManager.GetSetting("LUIS_SUBSCRIPTION_ID");
 ```
+These are the connection strings of the services that you will create later during the hands on lab.
 
-We will see later what kind of settings they are.
-
-Check if the device is registerd and its status that is saved to the IoT Hub [device twin](https://goo.gl/DwvBHf), using the code:
+2. Check if the device is registered and its status that is saved to the IoT Hub [device twin](https://goo.gl/DwvBHf):
 
 ```cs
 if (id != null)
@@ -175,21 +175,107 @@ private async Task<Twin> SetDefaultStatus(string macAddress, string etag)
     return twin;
 }
 ```
+The server side code of the application is now ready.
 
-Note that the new twin of the device is described as JSON object.
+## 1.2 Client side
 
+Now we want to add the possibility to set a command by voice, and send it to the device.
 
-In this tutorial we don't change the html code of the websites, because the main goal of the hands on lab is to understand how to manage the devices registered in the IoT Hub.  
+To do so we use some [Microsoft Cognitive Services](https://www.microsoft.com/cognitive-services/en-us/apis).
 
+The flow is:
+1. Register a command by microphone and send it to the [Bing Speech API](https://www.microsoft.com/cognitive-services/en-us/speech-api) that translate the voice command in a text
+2. Send the returned text to [Language Understanding Intelligent Service (LUIS)](https://www.microsoft.com/cognitive-services/en-us/language-understanding-intelligent-service-luis) api, that understand and return the more likely intention of the user
+3. Set the intent to the command box in the dashboard web page and send it to the device
 
-## 1.2 Restore project dependencies
+The entire flow is managed client side by javascript.
 
-Now that we completed the server side code of the dashboard, we must restore the missing libraries (.dll) throught [NuGet](https://www.nuget.org/) package manager.
+1. Open the *Index.cshtml* page
+2. Add the HTML code to the page, that shows the controls to manage the microphone
 
-1. Right click on the Visual Studio project
-2. Click to *Manage NuGet Packages*
-3. Click to *Restore* button on the page that will be opened
+```html
+<div class="register-message-container">
+    <button value="Send" id="mic" class="btn btn-circle microphone" onclick="startSpeechToText()">Register</button>
+    <div class="register-message-text-container">
+        <div id="speech_api_output">Click to register a message for device</div>
+        <div id="timer-show"></div>
+    </div>
+</div>
+```
 
+3. Add the javascript function to the script section to retrieve the LUIS credentials of your own instance
+
+```javascript
+function getLuisConfig() {
+    var appid = '@Model.LUIS_APP_ID';
+    var subid = '@Model.LUIS_SUBSCRIPTION_ID';
+
+    if (appid && subid && appid.length > 0 && subid.length > 0) {
+        return { appid: appid, subid: subid };
+    }
+
+    return null;
+}
+```
+
+4. Implement the function that manage the microphone and call the Cognitive Services
+
+```javascript
+function startSpeechToText() {
+    var mode = getMode();
+    var luisCfg = getLuisConfig();
+
+    clearText();
+
+    if (luisCfg) {
+        // LUIS instance available
+        client = Microsoft.CognitiveServices.SpeechRecognition.SpeechRecognitionServiceFactory.createMicrophoneClientWithIntent(
+            getLanguage(),
+            getKey(),
+            luisCfg.appid,
+            luisCfg.subid);
+    } else {
+        // LUIS instance not available
+        client = Microsoft.CognitiveServices.SpeechRecognition.SpeechRecognitionServiceFactory.createMicrophoneClient(
+            mode,
+            getLanguage(),
+            getKey());
+    }
+
+    // start microphone registration
+    client.startMicAndRecognition();
+    $('#mic').addClass('listening');
+
+    // stop microphone registration when timer ends
+    timer(registerTimeMs,
+        function() {
+            client.endMicAndRecognition();
+            $('#mic').removeClass('listening');
+        });
+
+    // show the partial response retrieved by Bing Speech API
+    client.onPartialResponseReceived = function (response) {
+        setTranscriptText(response);
+    }
+
+    // show the final response retrieved by Bing Speech API
+    client.onFinalResponseReceived = function (response) {
+        console.log("SPEECH_TO_TEXT FINAL RESPONSE", response);
+        if(response && response[0] && response[0].transcript)
+            setTranscriptText(response[0].transcript);
+    }
+
+    // set the received intent by LUIS to the cloud 2 device message box
+    client.onIntentReceived = function (response) {
+        var responseJSON = JSON.parse(response);
+        console.log("SPEECH_TO_TEXT INTENT RECEIVED", responseJSON);
+        if (responseJSON && responseJSON.intents && responseJSON.intents[0] && responseJSON.intents[0].score > 0.5)
+            setIntentText(responseJSON.intents[0].intent);
+    };
+}
+```
+
+The dashboard project is now complete, so you are ready to show the data coming from the devices and send commands to them.
 
 # 2. WebJobs-Shared
 
@@ -290,9 +376,9 @@ The project contains two main files:
 - Function.cs: contains the method triggered at midnight
 
 
-So let's start completing the *Program.cs*.
+1. Open the *Program.cs* class.
 
-Read the connection strings that the program will use to connect to the Azure services like IoT Hub and Storage from the app.config file.
+2. Read the connection strings that the program will use to connect to the Azure services like IoT Hub and Storage from the app.config file.
 To do this, implementis the following method:
 
 
@@ -323,9 +409,9 @@ private static bool VerifyConfiguration()
 ```
 
 
-The we can complete the *Functions.cs* file.
+3. Open the *Functions.cs* class.
 
-By dependency injection get an instance of DeviceManager, that is responsible of all the communication with the IoT Hub.
+4. By dependency injection get an instance of DeviceManager, that is responsible of all the communication with the IoT Hub.
 
 ```cs
 private readonly IDeviceManager _deviceManager;
@@ -336,7 +422,7 @@ public Functions(IDeviceManager deviceManager)
 }
 ```
 
-In the CronJob method we need to call the methods that call with the IoT Hub to enable the devices and to update their states on the corresponding twin:
+5. In the CronJob method enable all the devices registered in the Iot Hub and update their state:
 
 ```cs
 // Triggers every day at 00:00:00
@@ -375,8 +461,6 @@ private async void EnableAllStatus()
 }
 ```
 
-In the *EnableAllStatus* method we get all the devices which status is *disabled* or *warning* but not the ones that are in the *enable* state.
-
 The job that every day call the iot hub to enable all the devices is now implemented.
 
 
@@ -386,8 +470,8 @@ This web job change the status of each device that exceed the hourly quota of ev
 
 The device status is implemented as a state machine, so every device can have 3 states:
 - **enabled**: it can send events to IoT Hub
-- **warning**: when it exceed the quota for the first time. It can continue to send events to IoT Hub but it is notified by the application to decrease the frequency
-- **disabled**: if the device exceed the quota 2 times consecutively it is disabled and it cannot send events until the next day
+- **warning**: set when it exceed the quota for the first time. It can continue to send events to IoT Hub but it is notified by the application to decrease the frequency
+- **disabled**: set if the device exceed the quota 2 times consecutively it is disabled and it cannot send events until the next day
 
 
 The number of events sent from each device is counted by the Stream Analytics connected to the IoT Hub.
@@ -475,5 +559,90 @@ public async void SBQueue2IotHubDevice(
 Your web job is now complete!
 
 
+# 5. API
 
+This ASP.NET Web API project, contains some REST services to regiter, remove and get the authentication key (token) of a device.
 
+The *TokenRepository* class manages all the operation with the IoT Hub, that contains the device registry.
+
+1. Open the *TokenRepository* class
+2. Define a RegistryManager that will communicate with the IoT Hub and instantiate it in the contructor
+
+```cs
+private RegistryManager registryManager;
+
+public TokensRepository(string iothubConnectionString)
+{
+    registryManager = RegistryManager.CreateFromConnectionString(iothubConnectionString);
+}
+
+```
+
+3. Implement the method that add a device to the IoT Hub registry and return its personal key
+
+```cs
+public async Task<IToken> Add(string deviceId, bool demo)
+{
+    try
+    {
+        Device device = await registryManager.AddDeviceAsync(new Device(deviceId));
+        var twin = await Enable(device.Id, demo);
+
+        return new IotHubToken()
+        {
+            DeviceID = device.Id,
+            Token = device.Authentication.SymmetricKey.PrimaryKey,
+            Status = twin.Properties.Desired.Contains("status") ? twin.Properties.Desired["status"] : "Unknown"
+        };
+    }
+    catch (Exception ex)
+    {
+        throw;
+    }
+}
+```
+
+4. Implement the method that return a device token given its id
+
+```cs
+public async Task<IToken> Get(string deviceId)
+{
+
+    Device device = await registryManager.GetDeviceAsync(deviceId);
+
+    if (device == null)
+        return null;
+
+    var twin = await registryManager.GetTwinAsync(device.Id);
+
+    return new IotHubToken()
+    {
+        DeviceID = device.Id,
+        Token = device.Authentication.SymmetricKey.PrimaryKey,
+        Status = twin.Properties.Desired.Contains("status") ? twin.Properties.Desired["status"] : "Unknown"
+    };
+
+}
+```
+
+5. Implement the method that remove a device from the IoT Hub registry
+
+```cs
+public async Task Remove(string deviceId)
+{
+    Device device = await registryManager.GetDeviceAsync(deviceId);
+
+    if (device == null)
+        throw new DeviceNotFoundException(deviceId);
+
+    await registryManager.RemoveDeviceAsync(device);
+}
+```
+
+Your API project is now complete!
+
+# 6. Conclusion
+
+The code of the solution is now complete, but in order to be able to build it, we need to set the connection strings of the the Azure services used by this application.
+
+You will see these steps in the [next part](IoTCamp/tree/master/FinalProjects) of the hand on lab.
