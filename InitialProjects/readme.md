@@ -24,7 +24,6 @@ In the next steps we will complete the code of the *HomeController.cs* class.
 
 1. Load the settings from the configuration file of the project at the beginning of the *Index* method:
 
-
 ```cs
 // Load settings from web.config
 model.API_URL = CloudConfigurationManager.GetSetting("API.URL");
@@ -202,7 +201,6 @@ The entire flow is managed client side by javascript.
     </div>
 </div>
 ```
-
 3. Add the javascript function to the script section to retrieve the LUIS credentials of your own instance
 
 ```javascript
