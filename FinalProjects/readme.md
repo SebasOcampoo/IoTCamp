@@ -3,7 +3,7 @@
 First of we are going to create the Azure architecture:
 
 * Login in the [Azure Portal](https://portal.azure.com) 
-* Follow the instructions below (CLOUD ARCHITECTURE and PROJECTS CONFIGURATION)
+* Follow the instructions [below](#CLOUD-ARCHITECTURE) (CLOUD ARCHITECTURE and PROJECTS CONFIGURATION)
 
 # CLOUD ARCHITECTURE
 
