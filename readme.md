@@ -16,7 +16,7 @@ Depending by the fact that you are interested or not to the details of that appl
     * Follow [this](/FinalProjects) instructions to create the cloud infrastructure and configure the projects
     * Run your project!
     
-
+<br>
 
 
 Requirements for the hand on lab:
@@ -25,6 +25,8 @@ Requirements for the hand on lab:
 * [Microsoft Azure SDK for .NET](https://go.microsoft.com/fwlink/?LinkId=518003&clcid=0x410)
 * An active Azure subscription
 
+    
+<br>
 
 
 Folders:
@@ -34,6 +36,8 @@ Folders:
 * [FinalProjects](/FinalProjects): contains the complete website code. Refer to ### Without writing code
 * [Utilities](/Utilities): script and other
 
+    
+<br>
 
 
 NOTE: Use the following commad to avoid committing config file:
