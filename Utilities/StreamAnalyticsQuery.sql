@@ -1,6 +1,6 @@
 -- IoTHubDM -> StreamAnalytics -> Service Bus Queue (Queue)
 --                             -> Event Hub (ehOut)
---                             -> SQL Azure (SQL )
+--                             -> SQL Azure (SQL)
 
 
 WITH NormalizedData AS (
