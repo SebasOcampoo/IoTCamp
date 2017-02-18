@@ -15,6 +15,6 @@ Update the `queuename` app setting in the `App.config` file:
 
 ```xml
 <appSettings>
-    <add key="queueName" value="<Put your queue's name here>" />
+    <add key="queueName" value="[PUT YOUR QUEUE'S NAME HERE]" />
 </appSettings>
 ```
