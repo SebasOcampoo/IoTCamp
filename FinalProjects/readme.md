@@ -32,7 +32,7 @@ Create the following Azure resources:
 
 **NOTE: All resources must be in the same subscription and region.** 
 
-Now we're going to create the cloud infrastructure connecting our services.
+Now we're going to create the cloud infrastructure connecting our services as shown in the figures below.
 
 ![Registration architecture](../Docs/images/registration.png)
 ![Registration architecture](../Docs/images/overall_architecture.png)
@@ -46,12 +46,23 @@ We need to configure the **Messaging Endpoint** Consumer Group.
     ![IotHub endpoints](../Docs/images/iothub_endpoints.png)
 
 3. Add **Consumer Group** for the StreamAnalytics named **streamanalytics**.
+StreamAnalytics will use this consumer group to connect to the Iot Hub.
 
     ![IotHub consumer groups](../Docs/images/iothub_consumergroups.png)
 
 
 ## 2. Configure EventHub
-1. Add Shared Access Policies to the **EventHub's Namespace**
+1. Add Shared Access Policies to the **EventHub's Namespace**.
+Each Shared Access Policies can have one or more permissions associated:
+
+    * Send: send data to Event Hub
+    * Listen: read data from Event Hub
+    * Manage: manage Event Hub
+
+Azure generate automatically two keys for each Shared Access Policy.
+These keys can be used by the services that want to talk with the Event Hub.
+For example, the services that must send data to the Event Hub must use a Shared Access Policy with at least Send permissions. 
+
     * Go in the Namespace blade (not the specific Event Hub blade), click **Shared access policies**, and then click **Add**.
 
         ![Eventhub shared_access_policy](../Docs/images/event_hub_shared_access_policy.png)
@@ -64,7 +75,7 @@ We need to configure the **Messaging Endpoint** Consumer Group.
         * Name: streamanalytics
         * Permissions: Send
 
-2. Add **Consumer Groups** to the EventHub
+2. Add [**Consumer Groups**](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-overview#consumer-groups) to the EventHub
     * Go in the Event Hub specific blade, click **Consumer Group**, and then click **+ Consumer Group**.
 
         ![EventHub consumer groups](../Docs/images/event_hub_consumer_group.png)
@@ -73,10 +84,8 @@ We need to configure the **Messaging Endpoint** Consumer Group.
         * **local** for local testing environment
         * **website** for the production environment
 
-    * You can find more information on Consumer Groups [here](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-overview#consumer-groups)
-
 ## 3. Configure ServiceBus Queue
-We now add Shared Access Policies to the ** ServiceBus Queue's Namespace**
+We now add Shared Access Policies to the ** ServiceBus Queue's Namespace**   
 1. Go in the Namespace blade (not the specific Event Hub blade), click **Shared access policies**, and then click **Add**.
 
     ![Queue shared_access_policy](../Docs/images/queue_access_policy.png)
@@ -92,22 +101,23 @@ We now add Shared Access Policies to the ** ServiceBus Queue's Namespace**
 
 ## 4. Configure SQL Database
 Now we're going to create the database structure.
-We use EntityFramework as ORM (more info [here](https://msdn.microsoft.com/en-us/library/bb399567.aspx)).
+We use Entity Framework as ORM (more info [here](https://msdn.microsoft.com/en-us/library/bb399567.aspx)).
 
 1. Take note of the Database connection string, [here](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-get-started#view-database-properties-in-the-azure-portal) is explained how to find it in the Azure portal.
-2. Open the solution in VisualStudio and open **API** project.
+2. Open the solution in Visual Studio and open **API** project.
 3. Put your connection string in `Web.config` file
 
     ```
-    <add name="Sensor2CloudContext" connectionString="<SQL DB ConnectionString>" providerName="System.Data.SqlClient" />
+    <add name="Sensor2CloudContext" connectionString="[SQL DB CONNECTIONSTRING]" providerName="System.Data.SqlClient" />
     ```
     
 4. Restore **Nuget packages** of the project 
-5. Open **Package Manager Console** in VisualStudio and run `Update-Database` (more info [here](https://www.asp.net/mvc/overview/getting-started/getting-started-with-ef-using-mvc/migrations-and-deployment-with-the-entity-framework-in-an-asp-net-mvc-application))
+5. Right click to the **API** project and click **Set as startup project**
+5. Open **Package Manager Console** in Visual Studio, select the API project from the dropdown list and run `Update-Database` (more info [here](https://www.asp.net/mvc/overview/getting-started/getting-started-with-ef-using-mvc/migrations-and-deployment-with-the-entity-framework-in-an-asp-net-mvc-application))
 
-## 5. Configure StreamAnalytics
+## 5. Configure Stream Analytics
 
-![StreamAnalytics architecture](../Docs/images/sa_io.png)
+![Stream Analytics architecture](../Docs/images/sa_io.png)
 
 ### Define input sources
 1. You can click the created analytics job on the portal dashboard.
@@ -116,7 +126,7 @@ We use EntityFramework as ORM (more info [here](https://msdn.microsoft.com/en-us
 
 3. Click **ADD**.
 
-    ![StreamAnalytics create input](../Docs/images/sa_input.png)
+    ![Stream Analytics create input](../Docs/images/sa_input.png)
 
 4. Enter *IoTHubDM* as **INPUT ALIAS**
 
@@ -132,7 +142,7 @@ We use EntityFramework as ORM (more info [here](https://msdn.microsoft.com/en-us
 
 10. Select *JSON* for **EVENT SERIALIZATION FORMAT** and *UTF8* for **ENCODING**.
 
-    ![StreamAnalytics create input](../Docs/images/sa_input_iothub.png)
+    ![Stream Analytics create input](../Docs/images/sa_input_iothub.png)
 
     Click Create to finish the wizard. Now all inputs are defined.
 
@@ -142,24 +152,24 @@ We use EntityFramework as ORM (more info [here](https://msdn.microsoft.com/en-us
 
 2. Click Add.
 
-    ![StreamAnalytics create input](../Docs/images/sa_output.png)
+    ![Stream Analytics create input](../Docs/images/sa_output.png)
 
-3. Add EventHub
+3. Add Event Hub
     * Set the Output alias to *'ehOut'* and then Sink to EventHub.
-    * Select the ServiceBus Namespace and the EventHub name that you created earlier.
-    * Use *'id'* as Partition key column. This is because messages processed by the StreamAnalytics Job have a field called *id* that identify the device. (Look at the query above and [here](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-overview#partitions) for more info about partitioning)
+    * Select the Service Bus Namespace and the Event Hub name that you created earlier.
+    * Use *'id'* as Partition key column. This is because messages processed by the Stream Analytics Job have a field called *id* that identify the device. (Look at the query above and [here](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-overview#partitions) for more info about partitioning)
     * Select *JSON* for **EVENT SERIALIZATION FORMAT**, *UTF-8* for **ENCODING** and *Array* for **Format**.
     * Click Create to finish the wizard.
 
-    ![StreamAnalytics create input](../Docs/images/sa_output_eh.png)
+    ![Stream Analytics create input](../Docs/images/sa_output_eh.png)
 
-4. Add ServiceBus Queue
-    * Set the Output alias to *'Queue'* and then Sink to Service bus Queue.
-    * Select the ServiceBus name and the Queue name that you created earlier.
+4. Add Service Bus Queue
+    * Set the Output alias to *'Queue'* and then Sink to Service Bus Queue.
+    * Select the Service Bus name and the Queue name that you created earlier.
     * Select *JSON* for **EVENT SERIALIZATION FORMAT**, *UTF-8* for **ENCODING** and *Array* for **Format**.
     * Click Create to finish the wizard.
 
-    ![StreamAnalytics create input](../Docs/images/sa_output_queue.png)
+    ![Stream Analytics create input](../Docs/images/sa_output_queue.png)
 
 5. Add SQL Database
     * Set the Output alias to 'SQL' and then Sink to SQL database.
@@ -168,11 +178,11 @@ We use EntityFramework as ORM (more info [here](https://msdn.microsoft.com/en-us
     * Enter *'Devices'* as the TABLE field.
     * Click Create to finish the wizard.
 
-    ![StreamAnalytics create input](../Docs/images/sa_output_sql.png)
+    ![Stream Analytics create input](../Docs/images/sa_output_sql.png)
 
 Now all outputs are defined.
 
-### Query
+### Define query
 First of all we need to remember the format of the messages we receive from devices:
 
 ```javascript
@@ -191,9 +201,8 @@ First of all we need to remember the format of the messages we receive from devi
 }
 ```
 
-You can find the final query below or [here](../Utilities/StreamAnalyticsQuery.sql).
+Al these messages are sent from the IoT Hub to the Stream Analytics that will process them according to the following query:
 
-Documentation on Azure StreamAnalytics Query Language [here](https://msdn.microsoft.com/en-us/library/azure/dn834998.aspx).
 
 ```sql
 -- IoTHubDM -> StreamAnalytics -> Service Bus Queue (Queue)
@@ -230,27 +239,42 @@ FROM IoTHubDM
 GROUP BY IoTHub.ConnectionDeviceId, TumblingWindow(second, 60)
 ```
 
+Set the query:
 
-You can find another example [here]https://docs.microsoft.com/en-us/azure/stream-analytics/stream-analytics-build-an-iot-solution-using-stream-analytics).
+1. Select QUERY to the Stream Analytics panel
 
-## 6. Start services
-Now we are ready to start the services.
+    ![Stream Analytics select query](../Docs/images/select_query.png)
 
-In the Azure portal, open your Azure StreamAnalytics blade and click on **start** ([official guide](https://docs.microsoft.com/en-us/azure/stream-analytics/stream-analytics-run-a-job)).
+2. Copy and paste the query to the new panel and click *Save*
+
+    ![Stream Analytics query](../Docs/images/sa_query.png)
 
 
-## 7. Create Cognitive Services API KEYS
+**More info about Azure Stream Analytics Query Language [here](https://msdn.microsoft.com/en-us/library/azure/dn834998.aspx).**
+
+You can find another usefull example [here](https://docs.microsoft.com/en-us/azure/stream-analytics/stream-analytics-build-an-iot-solution-using-stream-analytics).
+
+### Start Stream Analytics
+
+In the Azure portal, open your Azure Stream Analytics blade and click on **Start** button ([official guide](https://docs.microsoft.com/en-us/azure/stream-analytics/stream-analytics-run-a-job)).
+
+
+## 6. Create Cognitive Services API KEYS
 
 In this task, you will sign up for the BING SPEECH and LUIS analytics service.
 
-1. Navigate to Cognitive Services in the Azure Portal and ensure Bing Speech API is selected as the 'API type'.
-2. Select a plan. 
-3. Complete the other fields and create your account.
-4. Find your API Key. Copy the primary key, as you will need it when using the API services.
+1. Click **New** button and search *Cognitive Services APIs* in the Azure Portal.
+2. Click *Create*.
+3. Ensure *Bing Speech API* is selected as the 'API type'
+4. Select a plan. 
+5. Complete the other fields and create your account.
+6. Find your API Key. Copy the primary key, as you will need it when using the API services.
 
-Repeat the same steps to create Language Understanding Intelligent Service (LUIS) API.
+Repeat the same steps to create *Language Understanding Intelligent Service (LUIS) API*.
 
-Now you can train your language model at [www.luis.ai/](https://www.luis.ai/). 
+Now you can train your language model at [www.luis.ai/](https://www.luis.ai/).   
+The goal is to train LUIS to underastand phrases and translate it in intents.   
+Those intents will be sent as commands to the STM32 device.
 
 We need to understand at least 2 intents:
 * *' led on '*
@@ -262,27 +286,30 @@ so let's train the model with some italian phrases that should pass that intenti
 Follow [this](https://www.microsoft.com/cognitive-services/en-us/LUIS-api/documentation/GetStartedWithLUIS-Basics) link for further details.
 
 # PROJECTS CONFIGURATION
-At last we can test and publish our services, following the order.
+Now its time to configure and publish the ASP.NET web application to Azure Web App service.
 
-## 1. [Sensor2Cloud-Dashboard](Sensor2Cloud-Dashboard) 
+## 1. [Sensor2Cloud-Dashboard](Sensor2Cloud-Dashboard)   
+
+This projects show a website where the data coming from the device are shown in some graphs.
 
 ### Setup AppSettings and ConnectionStrings
 
-Insert AppSettings and ConnectionStrings in the `Web.config` file:
+Insert AppSettings and ConnectionStrings in the `Web.config` file of the project.   
+You can find the values in the settings blade of each previously created service under *Key* option.
 
 ```xml
 <appSettings>
-	<add key="Microsoft.ServiceBus.EventHubDevices" value="<EventHub name>" />
-	<add key="Microsoft.ServiceBus.EventHubDevices.PartitionCount" value="<EventHub partition count>" />
-	<add key="Microsoft.ServiceBus.EventHubDevices.ConsumerGroup" value="<EventHub production consumer group>" />
-	<add key="API.URL" value="<API Url>" />
-	<add key="BING_SPEECH_API_KEY" value="<BING SPEECH API KEY>" />
-    <add key="LUIS_APP_ID" value="<LUIS APP ID>" />
-    <add key="LUIS_SUBSCRIPTION_ID" value="<LUIS SUBSCRIPTION ID>" />
+    <add key="Microsoft.ServiceBus.EventHubDevices" value="[EVENTHUB NAME]" />
+    <add key="Microsoft.ServiceBus.EventHubDevices.PartitionCount" value="[EVENTHUB PARTITION COUNT]" />
+    <add key="Microsoft.ServiceBus.EventHubDevices.ConsumerGroup" value="[EVENTHUB PRODUCTION CONSUMER GROUP]" />
+    <add key="API.URL" value="[API URL]" />
+    <add key="BING_SPEECH_API_KEY" value="[BING SPEECH API KEY]" />
+    <add key="LUIS_APP_ID" value="[LUIS APP ID]" />
+    <add key="LUIS_SUBSCRIPTION_ID" value="[LUIS SUBSCRIPTION ID]" />
 </appSettings>
 <connectionStrings>
-	<add name="Microsoft.Azure.IoTHub.ConnectionString.Service" connectionString="<IotHub ConnectionString>" />
-	<add name="Microsoft.ServiceBus.ConnectionStringDevices" connectionString="<EventHub ConnectionString>" />
+    <add name="Microsoft.Azure.IoTHub.ConnectionString.Service" connectionString="[IOT HUB CONNECTION STRING]" />
+    <add name="Microsoft.ServiceBus.ConnectionStringDevices" connectionString="[EVENTHUB CONNECTION STRING]" />
 </connectionStrings>
 
 ```
@@ -295,23 +322,25 @@ Put your application insights instrumental key in the `ApplicationInsights.confi
 
 ### Test
 
-Run in VisualStudio.
+Run in Visual Studio.
 
 
 ### Publish
 
-Deploy this project in the Azure WebApp created before, using VisualStudio.
+[Deploy](https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-dotnet-get-started#deploy-the-web-project-to-azure) this project in the Azure Web App created before, using Visual Studio.
 
 
-## 2. [API](API) 
+## 2. [API](API)  
+
+This project expose web services for devices management.
 
 ### Setup ConnectionStrings
 
-Put your connection strings in the `Web.config` file:
+Put your connection strings in the `Web.config` file of the project:
 
 ```xml
-<add name="Sensor2CloudContext" connectionString="<SQL DB ConnectionString>" providerName="System.Data.SqlClient" />
-<add name="Microsoft.Azure.IoTHub.ConnectionString.Service" connectionString="<IoTHub ConnectionString>" />
+<add name="Sensor2CloudContext" connectionString="[SQL DB CONNECTION STRING]" providerName="System.Data.SqlClient" />
+<add name="Microsoft.Azure.IoTHub.ConnectionString.Service" connectionString="[IOT HUB CONNECTION STRING]" />
 ```
 
 Put your application insights instrumental key in the `ApplicationInsights.config` file
@@ -322,15 +351,16 @@ Put your application insights instrumental key in the `ApplicationInsights.confi
 
 ### Test
 
-Run in VisualStudio and open Swagger UI (/swagger) to test your APIs. More info on Swagger [here](https://docs.microsoft.com/en-us/azure/app-service-api/app-service-api-dotnet-get-started#use-swagger-api-metadata-and-ui).
+Run in Visual Studio and open Swagger UI (/swagger) to test your APIs. More info on Swagger [here](https://docs.microsoft.com/en-us/azure/app-service-api/app-service-api-dotnet-get-started#use-swagger-api-metadata-and-ui).
 
 
 ### Publish
-Deploy this project in the Azure API App created before, using VisualStudio.
+[Deploy](https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-dotnet-get-started#deploy-the-web-project-to-azure) this project in the Azure API App created before, using Visual Studio.
 
 
 
-## 3. [WebJob-NotifyDevices](WebJob-NotifyDevices) 
+## 3. [WebJob-NotifyDevices](WebJob-NotifyDevices)  
+
 
 ### Setup AppSettings and ConnectionStrings
 Put your connection strings in the `App.config` file:
@@ -345,11 +375,13 @@ Put your connection strings in the `App.config` file:
 
 ```  
 
-Update the `queuename` app setting in the `App.config` file:
+Update the app setting in the `App.config` file:
 
 ```xml
 <appSettings>
-    <add key="queueName" value="<Put your queue's name here>" />
+    <add key="queueName" value="[QUEUE NAME]" />
+    <add key="threshold" value="[THRESHOLD]"/>
+    <add key="Dashboard.URL" value="[DASHBOARD URL]"/>
 </appSettings>
 ```
 
@@ -361,7 +393,7 @@ Run in VisualStudio and add message to the queue to trigger the functions.
 To add test message to the queue you can create a console application like [this](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-java-how-to-use-queues#send-messages-to-a-queue).
 
 ### Publish
-Deploy this project as Azure WebJob in the Azure API App created before, using VisualStudio.
+[Deploy](https://docs.microsoft.com/en-us/azure/app-service-web/websites-dotnet-deploy-webjobs#a-iddeployadeploy-a-webjobs-project) this project as a continuous Azure WebJob in the Azure API App created before, using Visual Studio.
 
 
 
@@ -382,11 +414,11 @@ Put your connection strings in the `App.config` file:
 
 ### Test
 
-You can run this WebJob in VisualStudio.
+You can run this WebJob in Visual Studio.
 
 
 ### Publish
-Deploy this project as Azure WebJob in the Azure API App created before, using VisualStudio.
+[Deploy](https://docs.microsoft.com/en-us/azure/app-service-web/websites-dotnet-deploy-webjobs#a-iddeployadeploy-a-webjobs-project) this project a continuous Azure WebJob in the Azure API App created before, using Visual Studio.
 
 
 

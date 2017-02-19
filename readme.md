@@ -1,8 +1,8 @@
 This repo contains the docs and the hands on lab (HOL) of the IoT Camp.
 
-The goal of this HOL is to create a web based application able to receive data and to send command to devices in an IoT scenario.   
-The architecture of the application consist of some Azure services that communicate each other.
+The goal of this HOL is to create a web based application able to receive data and to send command to STMicroelectronics STM32 devices in an IoT scenario.   
 
+The backend architecture of the application consist of some Azure services that communicate each other.   
 One of the main component of the application is a website written in ASP.NET that shows data coming from sensors in a graphical way.   
 Depending by the fact that you are interested or not to the details of that application, you can decide to follow one of these two way to complete the HOL:
 
