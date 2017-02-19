@@ -637,4 +637,4 @@ Your API project is now complete!
 
 The code of the solution is now complete, but in order to be able to build it, we need to set the connection strings of the the Azure services used by this application.
 
-You will see these steps in the [next part](IoTCamp/tree/master/FinalProjects) of the hand on lab.
+You will see these steps in the [next part](/FinalProjects) of the hand on lab.
