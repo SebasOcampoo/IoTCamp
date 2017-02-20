@@ -17,8 +17,9 @@ Depending by the fact that you are interested or not to the details of that appl
     * clone this repo
     * Follow [this](/FinalProjects) instructions to create the cloud infrastructure and configure the projects
     * Run your project!
-    
-    
+        
+<br>
+
 Then you need to add the code for the device automatic registration, you can find it [here](./Utilities/STM32RegistrationAzure.zip).
     
 <br>
