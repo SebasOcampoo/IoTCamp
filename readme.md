@@ -1,4 +1,4 @@
-This repo contains the docs and the hands on lab (HOL) of the IoT Camp.
+# Hands on Lab
 
 The goal of this HOL is to create a web based application able to receive data and to send command to STMicroelectronics STM32 devices in an IoT scenario.   
 
