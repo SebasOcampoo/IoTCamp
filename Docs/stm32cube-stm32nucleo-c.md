@@ -119,8 +119,8 @@ Some cloud-to-device messages are a interpreted by the embedded application:
 
 A QuickStart guide to setup and run the application can also be downloaded [here][lnk-quickstart-st].
 
-[lnk-setup-iot-hub]: ../setup_iothub.md
-[lnk-manage-iot-hub]: ../manage_iot_hub.md
+[lnk-setup-iot-hub]: https://github.com/Azure/azure-iot-sdks-preview/blob/master/doc/setup_iothub.md
+[lnk-manage-iot-hub]: https://github.com/Azure/azure-iot-sdks-preview/blob/master/doc/manage_iot_hub.md
 [lnk-nucleo-f4]:http://www.st.com/content/st_com/en/products/evaluation-tools/product-evaluation-tools/mcu-eval-tools/stm32-mcu-eval-tools/stm32-mcu-nucleo/nucleo-f401re.html
 [lnk-nucleo-wifi]:http://www.st.com/content/st_com/en/products/ecosystems/stm32-open-development-environment/stm32-nucleo-expansion-boards/stm32-ode-connect-hw/x-nucleo-idw01m1.html
 [lnk-nucleo-sensors]:http://www.st.com/content/st_com/en/products/ecosystems/stm32-open-development-environment/stm32-nucleo-expansion-boards/stm32-ode-sense-hw/x-nucleo-iks01a1.html
