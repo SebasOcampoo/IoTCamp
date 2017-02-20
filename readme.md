@@ -4,8 +4,6 @@ The goal of this HOL is to create a web based application able to receive data a
 
 First of all you need to connect your STM32 to the cloud. Follow the [STMicroelectronics' official guide](./Docs/stm32cube-stm32nucleo-c.md).
 
-Then you need to add the code for the device automatic registration, you can find it [here](./Utilities/STM32RegistrationAzure.zip).
-
 The backend architecture of the application consist of some Azure services that communicate each other.   
 One of the main component of the application is a website written in ASP.NET that shows data coming from sensors in a graphical way.   
 Depending by the fact that you are interested or not to the details of that application, you can decide to follow one of these two way to complete the HOL:
@@ -19,6 +17,9 @@ Depending by the fact that you are interested or not to the details of that appl
     * clone this repo
     * Follow [this](/FinalProjects) instructions to create the cloud infrastructure and configure the projects
     * Run your project!
+    
+    
+Then you need to add the code for the device automatic registration, you can find it [here](./Utilities/STM32RegistrationAzure.zip).
     
 <br>
 
